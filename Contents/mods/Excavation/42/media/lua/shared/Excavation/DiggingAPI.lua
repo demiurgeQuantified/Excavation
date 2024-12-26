@@ -54,7 +54,7 @@ local objectSpriteBlacklist = {
 
 local removeBlacklistedObjects = function(square)
     local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
-    for i = 1, #objects do
+    for i = #objects, 1, -1 do
         local object = objects[i]
         if objectSpriteBlacklist[object:getSprite():getName()] then
             square:transmitRemoveItemFromSquare(object)
@@ -137,6 +137,15 @@ DiggingAPI.digSquare = function(x, y, z)
         removeCorner(southSquare)
     end
     removeBlacklistedObjects(westSquare)
+
+    for xOffset = -1, 1, 2 do
+        for yOffset = -1, 1, 2 do
+            local cornerSquare = getSquare(x + xOffset, y + yOffset, z)
+            if cornerSquare then
+                removeBlacklistedObjects(square)
+            end
+        end
+    end
 
     if northOrWestWallAdded then
         removeCorner(square)
