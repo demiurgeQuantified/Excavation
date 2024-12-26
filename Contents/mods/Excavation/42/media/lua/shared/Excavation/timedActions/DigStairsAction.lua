@@ -15,26 +15,42 @@ DigStairsAction.perform = function(self)
     if self.orientation == "south" then
         -- TODO: this creates and then destroys internal walls
         -- to optimise this DiggingAPI needs a way to open an area of squares and calculate the necessary walls once
-        for i = 1, 4 do
-            local square = IsoObjectUtils.getOrCreateSquare(x, y + i, z - 1)
-            if not square:getFloor() then
-                DiggingAPI.digSquare(x, y + i, z - 1)
-            end
-        end
         for i = 1, 3 do
             local square = getSquare(x, y + i, z)
             square:transmitRemoveItemFromSquare(square:getFloor())
+
+            local belowSquare = IsoObjectUtils.getOrCreateSquare(x, y + i, z - 1)
+            if not belowSquare:getFloor() then
+                DiggingAPI.digSquare(x, y + i, z - 1)
+            end
+
+            local obj = IsoObject.getNew(
+                belowSquare, "fixtures_excavation_01_" .. tostring(6 - i), "", false)
+            belowSquare:transmitAddObjectToSquare(obj, -1)
+        end
+
+        local endSquare = IsoObjectUtils.getOrCreateSquare(x, y + 4, z - 1)
+        if not endSquare:getFloor() then
+            DiggingAPI.digSquare(x, y + 4, z - 1)
         end
     else
-        for i = 1, 4 do
-            local square = IsoObjectUtils.getOrCreateSquare(x + i, y, z - 1)
-            if not square:getFloor() then
-                DiggingAPI.digSquare(x + i, y, z - 1)
-            end
-        end
         for i = 1, 3 do
             local square = getSquare(x + i, y, z)
             square:transmitRemoveItemFromSquare(square:getFloor())
+
+            local belowSquare = IsoObjectUtils.getOrCreateSquare(x + i, y, z - 1)
+            if not belowSquare:getFloor() then
+                DiggingAPI.digSquare(x + i, y, z - 1)
+            end
+
+            local obj = IsoObject.getNew(
+                belowSquare, "fixtures_excavation_01_" .. tostring(3 - i), "", false)
+            belowSquare:transmitAddObjectToSquare(obj, -1)
+        end
+
+        local endSquare = IsoObjectUtils.getOrCreateSquare(x + 4, y, z - 1)
+        if not endSquare:getFloor() then
+            DiggingAPI.digSquare(x + 4, y, z - 1)
         end
     end
     -- TODO: add stairs lol

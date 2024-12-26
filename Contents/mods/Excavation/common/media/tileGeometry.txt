@@ -1,0 +1,6 @@
+tileGeometry {
+    VERSION = 2,
+    tileset {
+        name = fixtures_excavation_01,
+    }
+}
