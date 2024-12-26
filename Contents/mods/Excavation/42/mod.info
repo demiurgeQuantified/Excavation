@@ -6,6 +6,6 @@ pack=Excavation
 tiledef=Excavation 2112
 poster=poster.png
 poster=dig.png
-modversion=42-0.1.0
+modversion=42-0.1.1
 versionMin=42.0.2
 author=albion
