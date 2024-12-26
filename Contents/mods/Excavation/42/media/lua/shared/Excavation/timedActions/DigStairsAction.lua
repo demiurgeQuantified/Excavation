@@ -1,11 +1,11 @@
+local BaseDigAction = require("Excavation/timedActions/BaseDigAction")
 local DiggingAPI = require("Excavation/DiggingAPI")
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 
----@class DigStairsAction : ISBaseTimedAction
----@field character IsoGameCharacter
+---@class DigStairsAction : BaseDigAction
 ---@field originSquare IsoGridSquare
 ---@field orientation "south"|"east"
-local DigStairsAction = ISBaseTimedAction:derive("DigStairsAction")
+local DigStairsAction = BaseDigAction:derive("DigStairsAction")
 DigStairsAction.__index = DigStairsAction
 
 DigStairsAction.SACKS_NEEDED = 6
@@ -40,11 +40,7 @@ DigStairsAction.perform = function(self)
     -- TODO: add stairs lol
     -- TODO: endurance loss and muscle strain
     -- TODO: seems like cutaway and maybe lighting is buggy until a reload/building something in the pit
-    ISBaseTimedAction.perform(self)
-end
-
-DigStairsAction.isValid = function(self)
-    return true
+    BaseDigAction.perform(self)
 end
 
 ---@param character IsoGameCharacter
@@ -64,7 +60,7 @@ end
 ---@param orientation "south"|"east"
 ---@return DigStairsAction
 DigStairsAction.new = function(character, square, orientation)
-    local o = ISBaseTimedAction:new(character)
+    local o = BaseDigAction.new(character)
     setmetatable(o, DigStairsAction) ---@cast o DigStairsAction
 
     o.maxTime = character:isTimedActionInstant() and 1 or 1000

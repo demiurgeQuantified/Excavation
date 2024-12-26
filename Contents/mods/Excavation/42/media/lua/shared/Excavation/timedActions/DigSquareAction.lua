@@ -1,11 +1,7 @@
+local BaseDigAction = require("Excavation/timedActions/BaseDigAction")
 local TimedActionUtils = require("Starlit/timedActions/TimedActionUtils")
 local Eval = require("Excavation/Eval")
-
----@module "Excavation/DiggingAPI"
-local DiggingAPI
-Events.OnInitGlobalModData.Add(function()
-    DiggingAPI = require("Excavation/DiggingAPI")
-end)
+local DiggingAPI = require("Excavation/DiggingAPI")
 
 local CACHE_ARRAY_LIST = ArrayList.new()
 
@@ -37,20 +33,16 @@ local getClosestAdjacentSquare = function(x, y, z, character)
     return closest
 end
 
----@class DigSquareAction : ISBaseTimedAction
+---@class DigSquareAction : BaseDigAction
 ---@field x integer
 ---@field y integer
 ---@field z integer
----@field digTool InventoryItem
----@field handle integer
----@field character IsoGameCharacter
-local DigSquareAction = ISBaseTimedAction:derive("DigSquareAction")
+local DigSquareAction = BaseDigAction:derive("DigSquareAction")
 DigSquareAction.__index = DigSquareAction
 
 DigSquareAction.SACKS_NEEDED = 3
 
 DigSquareAction.perform = function(self)
-    self:stopCommon()
     DiggingAPI.digSquare(self.x, self.y, self.z)
 
     local inverseStrengthLevel = 10 - self.character:getPerkLevel(Perks.Strength)
@@ -60,45 +52,7 @@ DigSquareAction.perform = function(self)
     local stats = self.character:getStats()
     stats:setEndurance(stats:getEndurance() - (0.2 + inverseStrengthLevel / 80))
 
-    -- when timed action cheat is on don't use sacks for easier debugging
-    if not self.character:isTimedActionInstant() then
-        local inventory = self.character:getInventory()
-        local sacks = inventory:getSomeEval(Eval.canCarryDirt, DigSquareAction.SACKS_NEEDED)
-        for i = 0, DigSquareAction.SACKS_NEEDED - 1 do
-            inventory:Remove(sacks:get(i))
-        end
-        inventory:AddItems("Base.Dirtbag", DigSquareAction.SACKS_NEEDED)
-        CACHE_ARRAY_LIST:clear()
-    end
-
-    ISBaseTimedAction.perform(self)
-end
-
-DigSquareAction.stop = function(self)
-    self:stopCommon()
-    ISBaseTimedAction.stop(self)
-end
-
-DigSquareAction.stopCommon = function(self)
-    self.digTool:setJobDelta(0)
-    self.character:getEmitter():stopSound(self.handle)
-end
-
-DigSquareAction.update = function(self)
-    self.digTool:setJobDelta(self:getJobDelta())
-    self.character:setMetabolicTarget(Metabolics.HeavyWork)
-    local emitter = self.character:getEmitter()
-    if not emitter:isPlaying(self.handle) then
-        self.handle = emitter:playSound("Shoveling")
-    end
-    -- TODO: periodic player voice grunts?
-end
-
-DigSquareAction.start = function(self)
-    self.digTool = self.character:getPrimaryHandItem()
-    self:setActionAnim(BuildingHelper.getShovelAnim(self.digTool))
-    self.digTool:setJobType(getText("IGUI_Excavation_Dig"))
-    self.handle = self.character:getEmitter():playSound("Shoveling")
+    BaseDigAction.perform(self)
 end
 
 DigSquareAction.isValid = function(self)
@@ -107,24 +61,8 @@ DigSquareAction.isValid = function(self)
         return false
     end
 
-    local sacks = self.character:getInventory():getSomeEvalRecurse(
-        Eval.canCarryDirt, DigSquareAction.SACKS_NEEDED, CACHE_ARRAY_LIST)
-    if sacks:size() < DigSquareAction.SACKS_NEEDED then
-        CACHE_ARRAY_LIST:clear()
-        return false
-    end
-    CACHE_ARRAY_LIST:clear()
-
-    return true
+    return BaseDigAction.isValid(self)
 end
-
--- this doesn't work in b42 because complete() (where the equip actually applies)
--- doesn't run until after isValidStart
---
--- DigSquareAction.isValidStart = function(self)
---     -- local primaryHandItem = self.character:getPrimaryHandItem()
---     -- return primaryHandItem and Eval.canDig(primaryHandItem)
--- end
 
 DigSquareAction.waitToStart = function(self)
     self.character:faceLocation(self.x, self.y)
@@ -136,7 +74,7 @@ end
 ---@param y integer
 ---@param z integer
 DigSquareAction.new = function(character, x, y, z)
-    local o = ISBaseTimedAction:new(character)
+    local o = BaseDigAction.new(character)
     setmetatable(o, DigSquareAction)
 
     o.x = x
