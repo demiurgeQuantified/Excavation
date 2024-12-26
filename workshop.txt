@@ -1,0 +1,25 @@
+version=1
+id=
+title=Excavation - Basement Expansion
+description=Allows digging through walls to expand basements. To dig, you need a shovel and some sacks to carry the dug out dirt in. Digging will tire you out very quickly.
+description=
+description=[h1]Future features[/h1]
+description=While it is to the best of my knowledge stable, this mod is still WIP. Intended future features are:
+description=[list]
+description=[*]Digging downwards to create entirely new underground areas and sub-basements. This is my highest priority.
+description=[*]Building stairs upwards out of underground areas.
+description=[*]Require sledgehammering walls before digging through them.
+description=[*]Stability system that requires you to build sufficient supports or risk a lethal cave-in.
+description=[*]'Minecraft' mode with underground ores.
+description=[*]Allow building new walls directly on top of dirt walls.
+description=[/list]
+description=
+description=[h1]Known issues[/h1]
+description=[list]
+description=[*]Excavated areas are not considered indoors, so you will be rained on. This seems to be a hard limitation of the game, but I am still researching ways to bypass this.
+description=[*]Sledgehammers behave very weirdly in basements. [b]This is a vanilla issue.[/b]
+description=[/list]
+description=
+description=[url=https://github.com/demiurgeQuantified/Excavation]View on GitHub[/url]
+tags=Build 42;Building;Misc;Realistic;WIP
+visibility=public
