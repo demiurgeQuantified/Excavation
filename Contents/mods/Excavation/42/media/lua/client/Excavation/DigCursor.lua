@@ -1,6 +1,8 @@
 local DigSquareAction = require("Excavation/timedActions/DigSquareAction")
 local BaseSquareCursor = require("Starlit/client/BaseSquareCursor")
 
+local MIN_HEIGHT = -32
+
 ---@param square IsoGridSquare
 ---@return boolean
 local hasValidAdjacentSquare = function(square)
@@ -33,8 +35,31 @@ end
 
 ---@param square IsoGridSquare
 DigCursor.isValid = function(self, square)
-    return square and square:getZ() < 0 and (not square:getFloor())
-            and hasValidAdjacentSquare(square)
+    if not square then
+        return false
+    end
+
+    local z = square:getZ()
+    if z >= 0 then
+        return false
+    end
+
+    if not hasValidAdjacentSquare(square) then
+        return false
+    end
+
+    -- scan downwards for ground so that you can't dig in open pits
+    local x, y = square:getX(), square:getY()
+    for i = z, MIN_HEIGHT, -1 do
+        local belowSquare = getSquare(x, y, i)
+        if not belowSquare then
+            break
+        end
+        if belowSquare:hasFloor() then
+            return false
+        end
+    end
+    return true
 end
 
 ---@param player IsoPlayer
