@@ -16,14 +16,17 @@ DigStairsAction.perform = function(self)
         -- TODO: this creates and then destroys internal walls
         -- to optimise this DiggingAPI needs a way to open an area of squares and calculate the necessary walls once
         for i = 1, 3 do
+            -- remove the floor above the stairs
             local square = getSquare(x, y + i, z)
             square:transmitRemoveItemFromSquare(square:getFloor())
 
+            -- clear the square below
             local belowSquare = IsoObjectUtils.getOrCreateSquare(x, y + i, z - 1)
             if not belowSquare:getFloor() then
                 DiggingAPI.digSquare(x, y + i, z - 1)
             end
 
+            -- add the stair object
             local obj = IsoObject.getNew(
                 belowSquare, "fixtures_excavation_01_" .. tostring(6 - i), "", false)
             belowSquare:transmitAddObjectToSquare(obj, -1)
@@ -53,7 +56,6 @@ DigStairsAction.perform = function(self)
             DiggingAPI.digSquare(x + 4, y, z - 1)
         end
     end
-    -- TODO: add stairs lol
     -- TODO: endurance loss and muscle strain
     -- TODO: seems like cutaway and maybe lighting is buggy until a reload/building something in the pit
     BaseDigAction.perform(self)

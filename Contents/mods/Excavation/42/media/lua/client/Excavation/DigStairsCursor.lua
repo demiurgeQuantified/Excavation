@@ -1,5 +1,6 @@
 local BaseSquareCursor = require("Starlit/client/BaseSquareCursor")
 local DigStairsAction = require("Excavation/timedActions/DigStairsAction")
+local DiggingAPI = require("Excavation/DiggingAPI")
 
 local CORE = getCore()
 
@@ -80,6 +81,11 @@ DigStairsCursor.canDigDown = function(self, x, y, z)
     local upperSquare = getSquare(x, y, z)
     -- upper square must be dug out
     if not upperSquare or not self:isSquareClear(upperSquare) then
+        return false
+    end
+
+    local floor = upperSquare:getFloor()
+    if not DiggingAPI.isDiggableFloor(floor) then
         return false
     end
 

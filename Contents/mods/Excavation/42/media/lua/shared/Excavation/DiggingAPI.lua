@@ -63,6 +63,16 @@ local removeBlacklistedObjects = function(square)
     end
 end
 
+---@param floor IsoObject
+DiggingAPI.isDiggableFloor = function(floor)
+    local spriteName = floor:getSprite():getName()
+    if luautils.stringStarts(spriteName, "floors_exterior_natural")
+            or luautils.stringStarts(spriteName, "blends_natural_01") then
+        return true
+    end
+    return false
+end
+
 ---@param x integer
 ---@param y integer
 ---@param z integer
