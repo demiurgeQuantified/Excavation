@@ -3,6 +3,7 @@ local DigSquareAction = require("Excavation/timedActions/DigSquareAction")
 local DigStairsAction = require("Excavation/timedActions/DigStairsAction")
 local DigCursor = require("Excavation/DigCursor")
 local DigStairsCursor = require("Excavation/DigStairsCursor")
+local DiggingAPI = require("Excavation/DiggingAPI")
 
 local badColour = getCore():getBadHighlitedColor()
 badColour = table.newarray(badColour:getR(), badColour:getG(), badColour:getB())
@@ -20,6 +21,49 @@ ContextMenu.onDigStairs = function(player)
     getCell():setDrag(DigStairsCursor.new(player), player:getPlayerNum())
 end
 
+---@param player IsoPlayer
+---@param square IsoGridSquare
+---@param context ISContextMenu
+ContextMenu.doDigWallOption = function(player, square, context)
+    local z = square:getZ()
+    if z < 0 then
+        local option = context:addOption(
+            getText("IGUI_Excavation_DigWall"), player, ContextMenu.onDig)
+
+        local material = z < DiggingAPI.STONE_LEVEL and "stone" or "dirt"
+
+        local canDig, reason = DigSquareAction.canBePerformed(player, material)
+
+        if not canDig then
+            ---@cast reason -nil
+            option.notAvailable = true
+            option.toolTip = ISToolTip:new()
+            option.toolTip.description = badColourString .. getText(reason)
+        end
+    end
+end
+
+ContextMenu.doDigStairsOption = function(player, square, context)
+    local z = square:getZ()
+    if z <= -1 and not SandboxVars.Excavation.DisableDepthLimit or z <= -32 then
+        return
+    end
+
+    local option = context:addOption(
+        getText("IGUI_Excavation_DigStairs"), player, ContextMenu.onDigStairs)
+
+    local material = z <= DiggingAPI.STONE_LEVEL and "stone" or "dirt"
+
+    local canDig, reason = DigStairsAction.canBePerformed(player, material)
+
+    if not canDig then
+        ---@cast reason -nil
+        option.notAvailable = true
+        option.toolTip = ISToolTip:new()
+        option.toolTip.description = badColourString .. getText(reason)
+    end
+end
+
 ---@type Callback_OnFillWorldObjectContextMenu
 ContextMenu.fillContextMenu = function(playerNum, context, worldObjects, test)
     local player = getSpecificPlayer(playerNum)
@@ -31,56 +75,19 @@ ContextMenu.fillContextMenu = function(playerNum, context, worldObjects, test)
     if not square then return end
 
     local inventory = player:getInventory()
-    if not inventory:containsEvalRecurse(Eval.canDig) then return end
+    if not (inventory:containsEvalRecurse(Eval.canDigDirt)
+            or inventory:containsEvalRecurse(Eval.canDigStone)) then
+        return
+    end
 
-    -- TODO: refactor needed lol
-
-    local z = square:getZ()
-    if z <= 0 then
+    if square:getZ() <= 0 then
         local digSubmenu = ISContextMenu:getNew(context)
         context:addSubMenu(
             context:addOption(getText("IGUI_Excavation_Dig")),
             digSubmenu)
 
-        local numSacks = inventory:getCountEvalRecurse(Eval.canCarryDirt)
-
-        if z < 0 then
-            local option = digSubmenu:addOption(
-                getText("IGUI_Excavation_DigWall"), player, ContextMenu.onDig)
-
-            local cantDigReason
-            if numSacks < DigSquareAction.SACKS_NEEDED then
-                cantDigReason = getText(
-                    "Tooltip_Excavation_NeedDirtSack", DigSquareAction.SACKS_NEEDED)
-            elseif player:getMoodleLevel(MoodleType.Endurance) >= 2 then
-                cantDigReason = getText("Tooltip_Excavation_TooExhausted")
-            end
-
-            if cantDigReason then
-                option.notAvailable = true
-                option.toolTip = ISToolTip:new()
-                option.toolTip.description = badColourString .. cantDigReason
-            end
-        end
-
-        if z > -32 then
-            local option = digSubmenu:addOption(
-                getText("IGUI_Excavation_DigStairs"), player, ContextMenu.onDigStairs)
-
-            local cantDigReason
-            if numSacks < DigStairsAction.SACKS_NEEDED then
-                cantDigReason = getText(
-                    "Tooltip_Excavation_NeedDirtSack", DigStairsAction.SACKS_NEEDED)
-            elseif player:getMoodleLevel(MoodleType.Endurance) >= 2 then
-                cantDigReason = getText("Tooltip_Excavation_TooExhausted")
-            end
-
-            if cantDigReason then
-                option.notAvailable = true
-                option.toolTip = ISToolTip:new()
-                option.toolTip.description = badColourString .. cantDigReason
-            end
-        end
+        ContextMenu.doDigWallOption(player, square, digSubmenu)
+        ContextMenu.doDigStairsOption(player, square, digSubmenu)
     end
 end
 

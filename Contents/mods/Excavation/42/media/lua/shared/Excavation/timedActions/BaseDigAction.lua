@@ -1,4 +1,7 @@
 local Eval = require("Excavation/Eval")
+local DiggingAPI = require("Excavation/DiggingAPI")
+
+local log = require("Excavation/debug/Log")
 
 local CACHE_ARRAY_LIST = ArrayList.new()
 
@@ -6,14 +9,18 @@ local CACHE_ARRAY_LIST = ArrayList.new()
 ---@field character IsoGameCharacter
 ---@field digTool InventoryItem
 ---@field handle integer
+---@field material "dirt"|"stone"
 local BaseDigAction = ISBaseTimedAction:derive("BaseDigAction")
 BaseDigAction.__index = BaseDigAction
 
 BaseDigAction.SACKS_NEEDED = 0
+BaseDigAction.STONE_REWARD = 0
 
 BaseDigAction.perform = function(self)
+    self:stopCommon()
+
     -- when timed action cheat is on don't use sacks for easier debugging
-    if self.SACKS_NEEDED > 0 and not self.character:isTimedActionInstant() then
+    if self.material == "dirt" and self.SACKS_NEEDED > 0 and not self.character:isTimedActionInstant() then
         local inventory = self.character:getInventory()
         local sacks = inventory:getSomeEval(Eval.canCarryDirt, self.SACKS_NEEDED, CACHE_ARRAY_LIST)
         for i = 0, self.SACKS_NEEDED - 1 do
@@ -21,9 +28,10 @@ BaseDigAction.perform = function(self)
         end
         inventory:AddItems("Base.Dirtbag", self.SACKS_NEEDED)
         CACHE_ARRAY_LIST:clear()
+    elseif self.material == "stone" and self.STONE_REWARD > 0 then
+        self.character:getInventory():AddItems("Base.Stone2", self.STONE_REWARD)
     end
 
-    self:stopCommon()
     ISBaseTimedAction.perform(self)
 end
 
@@ -54,13 +62,39 @@ BaseDigAction.update = function(self)
 end
 
 BaseDigAction.isValid = function(self)
-    local sacks = self.character:getInventory():getSomeEvalRecurse(
-        Eval.canCarryDirt, self.SACKS_NEEDED, CACHE_ARRAY_LIST)
-    if sacks:size() < self.SACKS_NEEDED then
+    if self.material == "dirt" and self.SACKS_NEEDED > 0 then
+        local sacks = self.character:getInventory():getSomeEvalRecurse(
+            Eval.canCarryDirt, self.SACKS_NEEDED, CACHE_ARRAY_LIST)
+        if sacks:size() < self.SACKS_NEEDED then
+            CACHE_ARRAY_LIST:clear()
+            return false
+        end
         CACHE_ARRAY_LIST:clear()
+    end
+
+    local primaryHandItem = self.character:getPrimaryHandItem()
+    if not primaryHandItem
+            or (self.material == "dirt" and not Eval.canDigDirt(primaryHandItem))
+            or (self.material == "stone" and not Eval.canDigStone(primaryHandItem)) then
         return false
     end
-    CACHE_ARRAY_LIST:clear()
+
+    return true
+end
+
+---@param character IsoGameCharacter
+---@param material "stone"|"dirt"
+---@param square IsoGridSquare?
+---@return boolean canPerform, string? reason
+BaseDigAction.canBePerformed = function(character, material, square)
+    if material then
+        local canDig, reason = DiggingAPI.characterCanDig(
+            character, material)
+        if not canDig then
+            return canDig, reason
+        end
+    end
+
     return true
 end
 
@@ -73,10 +107,13 @@ end
 -- end
 
 ---@param character IsoGameCharacter
+---@param material "dirt"|"stone"
 ---@return BaseDigAction
-BaseDigAction.new = function(character)
+BaseDigAction.new = function(character, material)
     local o = ISBaseTimedAction:new(character)
     setmetatable(o, BaseDigAction) ---@cast o BaseDigAction
+
+    o.material = material
 
     return o
 end

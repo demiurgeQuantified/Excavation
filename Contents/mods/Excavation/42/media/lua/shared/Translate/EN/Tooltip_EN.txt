@@ -1,4 +1,0 @@
-Tooltip_EN = {
-    Tooltip_Excavation_NeedDirtSack = "You need %1 Sacks to do this.",
-    Tooltip_Excavation_TooExhausted = "Too exhausted to dig.",
-}

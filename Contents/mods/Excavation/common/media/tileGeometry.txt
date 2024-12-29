@@ -1,6 +1,140 @@
-tileGeometry {
-    VERSION = 2,
-    tileset {
-        name = fixtures_excavation_01,
-    }
+tileGeometry
+{
+	VERSION = 2,
+
+	tileset
+	{
+		name = fixtures_excavation_01,
+
+		/* fixtures_excavation_01_0 */
+		tile
+		{
+			xy = 0x0,
+
+			box
+			{
+				translate = -5493x-3177x369,
+				rotate = 900000x518528x-900000,
+				min = -5000x0x-6422,
+				max = 5000x9564x6422,
+			}
+		}
+
+		/* fixtures_excavation_01_1 */
+		tile
+		{
+			xy = 1x0,
+
+			box
+			{
+				translate = -6571x4146x-825,
+				rotate = 900000x518528x-900000,
+				min = -5000x0x-6422,
+				max = 5000x9564x6422,
+			}
+
+			box
+			{
+				translate = -2125x-425x-859,
+				rotate = 1799854x899802x-1799854,
+				min = -5000x0x-6422,
+				max = 5000x8120x6422,
+			}
+		}
+
+		/* fixtures_excavation_01_2 */
+		tile
+		{
+			xy = 2x0,
+
+			box
+			{
+				translate = -6547x12072x-724,
+				rotate = 900000x518528x-900000,
+				min = -5000x0x-6422,
+				max = 5000x9564x6422,
+			}
+
+			box
+			{
+				translate = -2125x-425x-792,
+				rotate = 1799854x899802x-1799854,
+				min = -5000x0x-6422,
+				max = 5000x15946x6422,
+			}
+		}
+
+		/* fixtures_excavation_01_3 */
+		tile
+		{
+			xy = 3x0,
+
+			box
+			{
+				translate = -471x-3976x-6591,
+				rotate = 381471x0x0,
+				min = -5000x0x-6422,
+				max = 5000x9564x6422,
+			}
+
+			properties
+			{
+				OpaquePixelsOnly = true,
+			}
+		}
+
+		/* fixtures_excavation_01_4 */
+		tile
+		{
+			xy = 4x0,
+
+			box
+			{
+				translate = -471x4146x-6571,
+				rotate = 381471x0x0,
+				min = -5000x0x-6422,
+				max = 5000x9564x6422,
+			}
+
+			box
+			{
+				translate = -471x-425x-2125,
+				rotate = 0x0x0,
+				min = -5000x0x-6422,
+				max = 5000x8120x6422,
+			}
+
+			properties
+			{
+				OpaquePixelsOnly = true,
+			}
+		}
+
+		/* fixtures_excavation_01_5 */
+		tile
+		{
+			xy = 5x0,
+
+			box
+			{
+				translate = -471x12072x-6547,
+				rotate = 381471x0x0,
+				min = -5000x0x-6422,
+				max = 5000x9564x6422,
+			}
+
+			box
+			{
+				translate = -471x-425x-2125,
+				rotate = 0x0x0,
+				min = -5000x0x-6422,
+				max = 5000x15946x6422,
+			}
+
+			properties
+			{
+				OpaquePixelsOnly = true,
+			}
+		}
+	}
 }
