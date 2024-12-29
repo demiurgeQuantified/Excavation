@@ -20,6 +20,9 @@ description=[*]Excavated areas are not considered indoors, so you will be rained
 description=[*]Sledgehammers behave very weirdly in basements. [b]This is a vanilla issue.[/b]
 description=[/list]
 description=
+description=[h1]Translation credits[/h1]
+description=French translation by [url=https://steamcommunity.com/id/Furthick]Furthick[/url]
+description=
 description=[url=https://github.com/demiurgeQuantified/Excavation]View on GitHub[/url]
 tags=Build 42;Building;Misc;Realistic;WIP
 visibility=public
