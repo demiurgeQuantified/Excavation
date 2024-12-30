@@ -25,22 +25,24 @@ local invalidatedChunkLevels = {}
 Events.OnTick.Add(function()
     for i = 0, getNumActivePlayers() - 1 do
         local player = getSpecificPlayer(i)
-        local z = math.floor(player:getZ())
-        if invalidatedChunkLevels[z] then
-            local zChunks = invalidatedChunkLevels[z]
-            local chunk = player:getChunk()
-            local x = chunk.wx
-            if zChunks[x] then
-                local y = chunk.wy
-                if zChunks[x][y] then
-                    chunk:invalidateRenderChunkLevel(z, DIRTY_OBJECT_ADD)
-                    zChunks[x][y] = nil
-                    --print(string.format("[Excavation] Refreshed chunk %d,%d,%d", x, y, z))
-                    -- cleanup extra memory
-                    if isEmpty(zChunks[x]) then
-                        zChunks[x] = nil
-                        if isEmpty(zChunks) then
-                            invalidatedChunkLevels[z] = nil
+        if player then
+            local z = math.floor(player:getZ())
+            if invalidatedChunkLevels[z] then
+                local zChunks = invalidatedChunkLevels[z]
+                local chunk = player:getChunk()
+                local x = chunk.wx
+                if zChunks[x] then
+                    local y = chunk.wy
+                    if zChunks[x][y] then
+                        chunk:invalidateRenderChunkLevel(z, DIRTY_OBJECT_ADD)
+                        zChunks[x][y] = nil
+                        --print(string.format("[Excavation] Refreshed chunk %d,%d,%d", x, y, z))
+                        -- cleanup extra memory
+                        if isEmpty(zChunks[x]) then
+                            zChunks[x] = nil
+                            if isEmpty(zChunks) then
+                                invalidatedChunkLevels[z] = nil
+                            end
                         end
                     end
                 end
