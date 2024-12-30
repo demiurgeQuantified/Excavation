@@ -13,6 +13,15 @@ for _, sprite in pairs(DiggingAPI.STONE) do
     DIGGABLE_SPRITES[sprite] = true
 end
 
+---@param square IsoGridSquare
+---@return boolean
+local isStandableSquare = function(square)
+    if not square:hasFloor() or square:HasStairs() then
+        return false
+    end
+    return true
+end
+
 ---@param x integer
 ---@param y integer
 ---@param z integer
@@ -23,7 +32,7 @@ local getClosestAdjacentSquare = function(x, y, z, character)
     local square = getSquare(x, y, z)
 
     local neighbour = square:getAdjacentSquare(IsoDirections.N)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(square, "north")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             table.insert(squares, neighbour)
@@ -31,7 +40,7 @@ local getClosestAdjacentSquare = function(x, y, z, character)
     end
 
     neighbour = square:getAdjacentSquare(IsoDirections.W)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(square, "west")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             table.insert(squares, neighbour)
@@ -39,7 +48,7 @@ local getClosestAdjacentSquare = function(x, y, z, character)
     end
 
     neighbour = square:getAdjacentSquare(IsoDirections.S)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(neighbour, "north")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             table.insert(squares, neighbour)
@@ -47,7 +56,7 @@ local getClosestAdjacentSquare = function(x, y, z, character)
     end
 
     neighbour = square:getAdjacentSquare(IsoDirections.E)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(neighbour, "west")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             table.insert(squares, neighbour)
@@ -76,7 +85,7 @@ end
 ---@return IsoGridSquare?
 local getValidAdjacentSquare = function(square)
     local neighbour = square:getAdjacentSquare(IsoDirections.N)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(square, "north")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             return neighbour
@@ -84,7 +93,7 @@ local getValidAdjacentSquare = function(square)
     end
 
     neighbour = square:getAdjacentSquare(IsoDirections.W)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(square, "west")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             return neighbour
@@ -92,7 +101,7 @@ local getValidAdjacentSquare = function(square)
     end
 
     neighbour = square:getAdjacentSquare(IsoDirections.S)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(neighbour, "north")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             return neighbour
@@ -100,7 +109,7 @@ local getValidAdjacentSquare = function(square)
     end
 
     neighbour = square:getAdjacentSquare(IsoDirections.E)
-    if neighbour and neighbour:hasFloor() then
+    if neighbour and isStandableSquare(neighbour) then
         local wall = IsoObjectUtils.getWall(neighbour, "west")
         if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
             return neighbour
