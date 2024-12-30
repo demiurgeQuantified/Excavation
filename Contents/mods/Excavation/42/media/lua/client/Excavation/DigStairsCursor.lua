@@ -1,8 +1,6 @@
 local BaseSquareCursor = require("Starlit/client/BaseSquareCursor")
 local DigStairsAction = require("Excavation/timedActions/DigStairsAction")
 local DiggingAPI = require("Excavation/DiggingAPI")
-local Eval = require("Excavation/Eval")
-local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 
 local CORE = getCore()
 

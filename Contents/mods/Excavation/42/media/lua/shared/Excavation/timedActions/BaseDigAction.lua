@@ -1,8 +1,6 @@
 local Eval = require("Excavation/Eval")
 local DiggingAPI = require("Excavation/DiggingAPI")
 
-local log = require("Excavation/debug/Log")
-
 local CACHE_ARRAY_LIST = ArrayList.new()
 
 ---@class BaseDigAction : ISBaseTimedAction
