@@ -21,6 +21,8 @@ description=[/list]
 description=
 description=[h1]Translation credits[/h1]
 description=French translation by [url=https://steamcommunity.com/id/Furthick]Furthick[/url]
+description=Russian translation by [url=https://steamcommunity.com/id/BigB322]Noomez[/url]
+description=Brazilian Portuguese translation by [url=https://steamcommunity.com/profiles/76561198078283236]Vinicius_Goy[/url]
 description=
 description=[url=https://github.com/demiurgeQuantified/Excavation]View on GitHub[/url]
 tags=Build 42;Building;Misc;Realistic;WIP
