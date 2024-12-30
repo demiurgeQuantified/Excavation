@@ -148,7 +148,7 @@ DigSquareAction.canBePerformed = function(character, material, square)
     if material == "dirt" then
         local inventory = character:getInventory()
         if inventory:getCountEvalRecurse(Eval.canCarryDirt) < DigSquareAction.SACKS_NEEDED then
-            return false, "Tooltip_Excavation_NeedDirtSack"
+            return false, "Tooltip_Excavation_NeedDirtSack", DigSquareAction.SACKS_NEEDED
         end
     end
 

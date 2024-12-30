@@ -83,7 +83,7 @@ end
 ---@param character IsoGameCharacter
 ---@param material "stone"|"dirt"
 ---@param square IsoGridSquare?
----@return boolean canPerform, string? reason
+---@return boolean canPerform, string? reason, any arg
 BaseDigAction.canBePerformed = function(character, material, square)
     if material then
         local canDig, reason = DiggingAPI.characterCanDig(

@@ -32,13 +32,13 @@ ContextMenu.doDigWallOption = function(player, square, context)
 
         local material = z < DiggingAPI.STONE_LEVEL and "stone" or "dirt"
 
-        local canDig, reason = DigSquareAction.canBePerformed(player, material)
+        local canDig, reason, arg = DigSquareAction.canBePerformed(player, material)
 
         if not canDig then
             ---@cast reason -nil
             option.notAvailable = true
             option.toolTip = ISToolTip:new()
-            option.toolTip.description = badColourString .. getText(reason)
+            option.toolTip.description = badColourString .. getText(reason, arg)
         end
     end
 end
@@ -54,13 +54,13 @@ ContextMenu.doDigStairsOption = function(player, square, context)
 
     local material = z <= DiggingAPI.STONE_LEVEL and "stone" or "dirt"
 
-    local canDig, reason = DigStairsAction.canBePerformed(player, material)
+    local canDig, reason, arg = DigStairsAction.canBePerformed(player, material)
 
     if not canDig then
         ---@cast reason -nil
         option.notAvailable = true
         option.toolTip = ISToolTip:new()
-        option.toolTip.description = badColourString .. getText(reason)
+        option.toolTip.description = badColourString .. getText(reason, arg)
     end
 end
 

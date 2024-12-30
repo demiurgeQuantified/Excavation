@@ -120,7 +120,7 @@ DigStairsAction.canBePerformed = function(character, material, square, orientati
 
     local inventory = character:getInventory()
     if inventory:getCountEvalRecurse(Eval.canCarryDirt) < DigStairsAction.SACKS_NEEDED then
-        return false, "Tooltip_Excavation_NeedDirtSack"
+        return false, "Tooltip_Excavation_NeedDirtSack", DigStairsAction.SACKS_NEEDED
     end
 
     return BaseDigAction.canBePerformed(character, material, square)
