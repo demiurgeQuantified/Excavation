@@ -24,7 +24,7 @@ DigCursor.select = function(self, square)
         self.player, square:getX(), square:getY(), z,
         z < DiggingAPI.STONE_LEVEL and "stone" or "dirt")
 
-    BaseSquareCursor.select(self, square, not Config.hideCursorAfterDigging:getValue())
+    BaseSquareCursor.select(self, square, Config.hideCursorAfterDigging:getValue())
 end
 
 DigCursor.isValid = function(self, square)
