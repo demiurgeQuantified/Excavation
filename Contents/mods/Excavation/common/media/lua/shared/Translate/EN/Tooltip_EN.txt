@@ -4,4 +4,5 @@ Tooltip_EN = {
     Tooltip_Excavation_NeedShovelForDirt = "You need a shovel to dig through dirt.",
     Tooltip_Excavation_NeedPickaxeForStone = "You need a pickaxe to dig through stone.",
     Tooltip_Excavation_NoPath = "No reachable location to dig from.",
+    Tooltip_Excavation_WaterTile = "Wall is holding back water.",
 }

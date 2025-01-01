@@ -302,6 +302,17 @@ DiggingAPI.canDigDownFrom = function(square)
     return true
 end
 
+---@param square IsoGridSquare
+---@return boolean, string?
+DiggingAPI.canDig = function(square)
+    local x, y, z = square:getX(), square:getY(), square:getZ()
+    local aboveSquare = getSquare(x, y, z + 1)
+    if aboveSquare:isWaterSquare() then
+        return false, "Tooltip_Excavation_WaterTile"
+    end
+    return true
+end
+
 ---@param x integer
 ---@param y integer
 ---@param z integer

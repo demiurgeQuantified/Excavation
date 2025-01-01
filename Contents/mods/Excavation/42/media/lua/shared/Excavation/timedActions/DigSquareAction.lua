@@ -149,6 +149,10 @@ end
 
 DigSquareAction.canBePerformed = function(character, material, square)
     if square then
+        local canDig, reason = DiggingAPI.canDig(square)
+        if not canDig then
+            return false, reason
+        end
         if not getValidAdjacentSquare(square) then
             return false, "Tooltip_Excavation_NoPath"
         end
