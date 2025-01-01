@@ -4,6 +4,7 @@ local DigStairsAction = require("Excavation/timedActions/DigStairsAction")
 local DigCursor = require("Excavation/DigCursor")
 local DigStairsCursor = require("Excavation/DigStairsCursor")
 local DiggingAPI = require("Excavation/DiggingAPI")
+local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 
 local badColour = getCore():getBadHighlitedColor()
 badColour = table.newarray(badColour:getR(), badColour:getG(), badColour:getB())
@@ -143,5 +144,65 @@ ContextMenu.fillContextMenu = function(playerNum, context, worldObjects, test)
 end
 
 Events.OnFillWorldObjectContextMenu.Add(ContextMenu.fillContextMenu)
+
+-- hack to fix sheet ropes below 0 not being removed
+local old_complete = ISRemoveSheetRope.complete
+---@diagnostic disable-next-line: duplicate-set-field
+ISRemoveSheetRope.complete = function(self)
+    local z = self.window:getZ()
+    if z >= 0 then
+        local x, y = self.window:getX(), self.window:getY()
+
+        local topSquare = self.window:getSquare()
+        local deleteProperty
+        if self.window:isNorthHoppable() then
+            if IsoObjectUtils.getFirst(topSquare, IsoFlagType.climbSheetTopN) then
+                deleteProperty = IsoFlagType.climbSheetN
+            else
+                deleteProperty = IsoFlagType.climbSheetS
+                y = y - 1
+            end
+        else
+            if IsoObjectUtils.getFirst(topSquare, IsoFlagType.climbSheetTopW) then
+                deleteProperty = IsoFlagType.climbSheetW
+            else
+                deleteProperty = IsoFlagType.climbSheetE
+                x = x - 1
+            end
+        end
+
+        -- scan to see if this sheet rope actually goes underground
+        for i = z, 0, -1 do
+            local square = getSquare(x, y, i)
+
+            if not square or square:TreatAsSolidFloor() then
+                return old_complete(self)
+            end
+        end
+
+        for i = 0, -32, -1 do
+            local square = getSquare(x, y, i)
+            if not square then
+                return old_complete(self)
+            end
+
+            local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
+            for j = 1, #objects do
+                local object = objects[j]
+                if object:getProperties():Is(deleteProperty) then
+                    square:transmitRemoveItemFromSquare(object)
+                    self.character:getInventory():AddItem(object:getName())
+                    break
+                end
+            end
+
+            if square:TreatAsSolidFloor() then
+                return old_complete(self)
+            end
+        end
+    end
+
+    return old_complete(self)
+end
 
 return ContextMenu
