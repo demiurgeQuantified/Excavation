@@ -25,6 +25,7 @@ description=Russian translation by [url=https://steamcommunity.com/id/BigB322]No
 description=Brazilian Portuguese translation by [url=https://steamcommunity.com/profiles/76561198078283236]Vinicius_Goy[/url]
 description=Polish translation by [url=https://steamcommunity.com/id/monib]Nacho Juarez[/url]
 description=German translation by [url=https://steamcommunity.com/id/DaNeo]DaNeo[/url]
+description=Spanish translation by [url=https://steamcommunity.com/id/Veloxyz]Veloxyz[/url]
 description=
 description=[url=https://github.com/demiurgeQuantified/Excavation]View on GitHub[/url]
 tags=Build 42;Building;Misc;Realistic;WIP
