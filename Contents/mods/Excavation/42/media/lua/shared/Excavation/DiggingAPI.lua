@@ -250,7 +250,7 @@ DiggingAPI.isDiggableFloor = function(floor)
 end
 
 ---@param square IsoGridSquare
----@param orientation "south"|"east"
+---@param orientation "south"|"east"|nil
 ---@param exclude IsoMovingObject?
 ---@return boolean
 DiggingAPI.isSquareClear = function(square, orientation, exclude)
@@ -259,17 +259,19 @@ DiggingAPI.isSquareClear = function(square, orientation, exclude)
         return false
     end
 
-    local isSouth = orientation == "south"
-    local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
-    for i = 1, #objects do
-        local object = objects[i]
-        local sprite = object:getSprite()
-        -- copied from buildutils U_U
-        if (sprite and sprite:getProperties():Is(isSouth and IsoFlagType.collideN or IsoFlagType.collideW))
-                or ((instanceof(object, "IsoThumpable") and object:getNorth() == isSouth) and not object:isCorner() and not object:isFloor())
-                or (instanceof(object, "IsoWindow") and object:getNorth() == isSouth)
-                or (instanceof(object, "IsoDoor") and object:getNorth() == isSouth) then
-            return false
+    if orientation then
+        local isSouth = orientation == "south"
+        local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
+        for i = 1, #objects do
+            local object = objects[i]
+            local sprite = object:getSprite()
+            -- copied from buildutils U_U
+            if (sprite and sprite:getProperties():Is(isSouth and IsoFlagType.collideN or IsoFlagType.collideW))
+                    or ((instanceof(object, "IsoThumpable") and object:getNorth() == isSouth) and not object:isCorner() and not object:isFloor())
+                    or (instanceof(object, "IsoWindow") and object:getNorth() == isSouth)
+                    or (instanceof(object, "IsoDoor") and object:getNorth() == isSouth) then
+                return false
+            end
         end
     end
 

@@ -83,7 +83,7 @@ DigStairsAction.canBePerformed = function(character, material, square, orientati
         ---@cast orientation -nil
         local z = square:getZ()
 
-        if not square:hasFloor() or not DiggingAPI.isSquareClear(square, orientation, character) then
+        if not square:hasFloor() or not DiggingAPI.isSquareClear(square, nil, character) then
             return false
         end
 
