@@ -43,6 +43,9 @@ ContextMenu.doDigWallOption = function(player, square, context)
     end
 end
 
+---@param player IsoPlayer
+---@param square IsoGridSquare
+---@param context ISContextMenu
 ContextMenu.doDigStairsOption = function(player, square, context)
     local z = square:getZ()
     if z <= -1 and not SandboxVars.Excavation.DisableDepthLimit or z <= -32 then
@@ -64,9 +67,57 @@ ContextMenu.doDigStairsOption = function(player, square, context)
     end
 end
 
+---@param player IsoPlayer
+---@param context ISContextMenu
+ContextMenu.fixMissingSheetRopeOption = function(player, context)
+    -- mostly just copy pasted from vanilla since it's a temp fix anyway
+    local fetch = ISWorldObjectContextMenu.fetchVars
+    local hoppableObject = fetch.hoppableN or fetch.hoppableW or fetch.thumpableWindow
+
+    local inventory = player:getInventory()
+
+    if hoppableObject ~= nil and not fetch.invincibleWindow and not fetch.window then
+        if hoppableObject:canAddSheetRope() and player:getCurrentSquare():getZ() <= 0 and
+                (hoppableObject:getSprite():getProperties():Is("TieSheetRope") or (inventory:containsTypeRecurse("Nails") and inventory:containsTypeRecurse("Hammer"))) then
+            if (inventory:getItemCountRecurse("SheetRope") >= hoppableObject:countAddSheetRope()) then
+                if hoppableObject:getSprite():getProperties():Is("TieSheetRope") then
+                    context:addGetUpOption(getText("ContextMenu_Tie_escape_rope_sheet"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), true);
+                else
+                    context:addGetUpOption(getText("ContextMenu_Nail_escape_rope_sheet"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), true);
+                end
+            end
+            if (inventory:getItemCountRecurse("Rope") >= hoppableObject:countAddSheetRope()) then
+                if hoppableObject:getSprite():getProperties():Is("TieSheetRope") then
+                    context:addGetUpOption(getText("ContextMenu_Tie_escape_rope"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), false);
+                else
+                    context:addGetUpOption(getText("ContextMenu_Nail_escape_rope"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), false);
+                end
+            end
+        end
+        if hoppableObject:haveSheetRope() then
+            context:addGetUpOption(getText("ContextMenu_Remove_escape_rope"), nil, ISWorldObjectContextMenu.onRemoveSheetRope, hoppableObject, player:getIndex());
+        end
+    end
+
+    if fetch.window ~= nil and not fetch.invincibleWindow then
+        if fetch.window:canAddSheetRope() and player:getCurrentSquare():getZ() <= 0 and not fetch.window:isBarricaded() and inventory:containsTypeRecurse("Nails") and inventory:containsTypeRecurse("Hammer") then
+            if (inventory:getItemCountRecurse("SheetRope") >= fetch.window:countAddSheetRope()) then
+                context:addGetUpOption(getText("ContextMenu_Nail_escape_rope_sheet"), nil, ISWorldObjectContextMenu.onAddSheetRope, fetch.window, player:getIndex(), true);
+            elseif (inventory:getItemCountRecurse("Rope") >= fetch.window:countAddSheetRope()) then
+                context:addGetUpOption(getText("ContextMenu_Nail_escape_rope"), nil, ISWorldObjectContextMenu.onAddSheetRope, fetch.window, player:getIndex(), false);
+            end
+        end
+        if fetch.window:haveSheetRope() then
+            context:addGetUpOption(getText("ContextMenu_Remove_escape_rope"), nil, ISWorldObjectContextMenu.onRemoveSheetRope, fetch.window, player:getIndex());
+        end
+    end
+end
+
 ---@type Callback_OnFillWorldObjectContextMenu
 ContextMenu.fillContextMenu = function(playerNum, context, worldObjects, test)
     local player = getSpecificPlayer(playerNum)
+
+    ContextMenu.fixMissingSheetRopeOption(player, context)
 
     local targetSquare = worldObjects[1] and worldObjects[1]:getSquare()
     if not targetSquare then return end
