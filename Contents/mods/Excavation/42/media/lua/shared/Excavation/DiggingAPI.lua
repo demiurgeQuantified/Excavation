@@ -307,7 +307,7 @@ end
 DiggingAPI.canDig = function(square)
     local x, y, z = square:getX(), square:getY(), square:getZ()
     local aboveSquare = getSquare(x, y, z + 1)
-    if aboveSquare:isWaterSquare() then
+    if aboveSquare and aboveSquare:isWaterSquare() then
         return false, "Tooltip_Excavation_WaterTile"
     end
     return true
