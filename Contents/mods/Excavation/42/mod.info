@@ -1,6 +1,6 @@
 name=Excavation
 id=Excavation
-description=Allows digging through walls to expand basements.
+description=Allows digging through the ground to expand basements.
 require=\StarlitLibrary
 pack=Excavation
 tiledef=Excavation 2112
