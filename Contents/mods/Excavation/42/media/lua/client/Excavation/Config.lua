@@ -1,11 +1,9 @@
-local OBJECT_ADD = 64
-
 local options = PZAPI.ModOptions:create("Excavation", "Excavation")
 
 local tryFixCutaways = function()
     for i = 0, getNumActivePlayers() - 1 do
         local player = getSpecificPlayer(i)
-        player:getChunk():invalidateRenderChunks(OBJECT_ADD)
+        player:getChunk():invalidateRenderChunks(FBORenderChunk.DIRTY_OBJECT_ADD)
     end
 end
 

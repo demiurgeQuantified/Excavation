@@ -34,7 +34,7 @@ Events.OnTick.Add(function()
                 if zChunks[x] then
                     local y = chunk.wy
                     if zChunks[x][y] then
-                        chunk:invalidateRenderChunkLevel(z, DIRTY_OBJECT_ADD)
+                        chunk:invalidateRenderChunkLevel(z, FBORenderChunk.DIRTY_OBJECT_ADD)
                         zChunks[x][y] = nil
                         --print(string.format("[Excavation] Refreshed chunk %d,%d,%d", x, y, z))
                         -- cleanup extra memory
