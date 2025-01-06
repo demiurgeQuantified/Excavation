@@ -17,7 +17,7 @@ local isEmpty = function(t)
     return true
 end
 
-local DIRTY_OBJECT_ADD = 64
+-- TODO: it might just be necessary to refresh every time the player changes negative z level lol
 
 ---@type table<integer, table<integer, table<integer, true>>>
 local invalidatedChunkLevels = {}
@@ -112,6 +112,7 @@ DiggingAPI.STONE_LEVEL = -2
 ---@param z integer
 ---@param material DiggingAPI.MaterialDefinition
 local addCornerIfNeeded = function(x, y, z, material)
+    -- FIXME: why is this adding corners when digging behind a wall?
     local square = IsoObjectUtils.getOrCreateSquare(x, y, z)
     if not square:getWall() then
         local obj = IsoObject.getNew(square, material.wallCornerSoutheast, "", false)
