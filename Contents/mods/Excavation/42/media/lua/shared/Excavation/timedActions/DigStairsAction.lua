@@ -13,7 +13,7 @@ DigStairsAction.__index = DigStairsAction
 DigStairsAction.SACKS_NEEDED = 6
 DigStairsAction.STONE_REWARD = 6
 
-DigStairsAction.perform = function(self)
+DigStairsAction.complete = function(self)
     local x, y, z = self.originSquare:getX(), self.originSquare:getY(), self.originSquare:getZ()
     if self.orientation == "south" then
         -- TODO: this creates and then destroys internal walls
@@ -62,12 +62,14 @@ DigStairsAction.perform = function(self)
 
     local stats = self.character:getStats()
     stats:setEndurance(stats:getEndurance() - (0.4 + inverseStrengthLevel / 80))
+    syncPlayerStats(self.character --[[@as IsoPlayer]], SyncPlayerStatsPacket.Stat_Endurance)
 
     -- FIXME: even numbered floors flicker until their chunk has gone offscreen
     -- this is probably related to every 2 floors sharing a texture
+    -- calling FBORenderLevels#clearCache() fixes it but not exposed, maybe tis will make it accessible
 
     -- cutaway is just permanently buggy :/ i think the cutaway system just doesn't handle underground well right now
-    BaseDigAction.perform(self)
+    return BaseDigAction.complete(self)
 end
 
 DigStairsAction.waitToStart = function(self)

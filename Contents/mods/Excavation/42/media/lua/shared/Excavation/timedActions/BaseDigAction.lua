@@ -14,22 +14,27 @@ BaseDigAction.__index = BaseDigAction
 BaseDigAction.SACKS_NEEDED = 0
 BaseDigAction.STONE_REWARD = 0
 
-BaseDigAction.perform = function(self)
-    self:stopCommon()
-
-    -- when timed action cheat is on don't use sacks for easier debugging
-    if self.material == "dirt" and self.SACKS_NEEDED > 0 and not self.character:isTimedActionInstant() then
-        local inventory = self.character:getInventory()
-        local sacks = inventory:getSomeEval(Eval.canCarryDirt, self.SACKS_NEEDED, CACHE_ARRAY_LIST)
-        for i = 0, self.SACKS_NEEDED - 1 do
-            inventory:Remove(sacks:get(i))
+BaseDigAction.complete = function(self)
+    -- when build cheat is on don't do anything to items
+    if not self.character:isBuildCheat() then
+        if self.material == "dirt" and self.SACKS_NEEDED > 0 then
+            local inventory = self.character:getInventory()
+            local sacks = inventory:getSomeEval(Eval.canCarryDirt, self.SACKS_NEEDED, CACHE_ARRAY_LIST)
+            for i = 0, self.SACKS_NEEDED - 1 do
+                inventory:Remove(sacks:get(i))
+            end
+            inventory:AddItems("Base.Dirtbag", self.SACKS_NEEDED)
+            CACHE_ARRAY_LIST:clear()
+        elseif self.material == "stone" and self.STONE_REWARD > 0 then
+            self.character:getInventory():AddItems("Base.Stone2", self.STONE_REWARD)
         end
-        inventory:AddItems("Base.Dirtbag", self.SACKS_NEEDED)
-        CACHE_ARRAY_LIST:clear()
-    elseif self.material == "stone" and self.STONE_REWARD > 0 then
-        self.character:getInventory():AddItems("Base.Stone2", self.STONE_REWARD)
     end
 
+    return true
+end
+
+BaseDigAction.perform = function(self)
+    self:stopCommon()
     ISBaseTimedAction.perform(self)
 end
 

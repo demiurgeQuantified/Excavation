@@ -129,7 +129,7 @@ DigSquareAction.STONE_REWARD = 3
 
 -- TODO: isValid that checks the square hasn't already been dug into
 
-DigSquareAction.perform = function(self)
+DigSquareAction.complete = function(self)
     DiggingAPI.digSquare(self.x, self.y, self.z)
 
     local inverseStrengthLevel = 10 - self.character:getPerkLevel(Perks.Strength)
@@ -138,8 +138,9 @@ DigSquareAction.perform = function(self)
 
     local stats = self.character:getStats()
     stats:setEndurance(stats:getEndurance() - (0.2 + inverseStrengthLevel / 80))
+    syncPlayerStats(self.character --[[@as IsoPlayer]], SyncPlayerStatsPacket.Stat_Endurance)
 
-    BaseDigAction.perform(self)
+    return BaseDigAction.complete(self)
 end
 
 DigSquareAction.waitToStart = function(self)
