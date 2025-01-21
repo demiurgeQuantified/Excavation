@@ -3,7 +3,7 @@ local options = PZAPI.ModOptions:create("Excavation", "Excavation")
 local tryFixCutaways = function()
     for i = 0, getNumActivePlayers() - 1 do
         local player = getSpecificPlayer(i)
-        player:getChunk():invalidateRenderChunks(FBORenderChunk.DIRTY_OBJECT_ADD)
+        player:getChunk():invalidateRenderChunkLevel(math.floor(player:getZ()), FBORenderChunk.DIRTY_OBJECT_ADD)
     end
 end
 
