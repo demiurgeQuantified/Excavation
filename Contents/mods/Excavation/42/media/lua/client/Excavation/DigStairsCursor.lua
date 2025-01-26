@@ -15,7 +15,9 @@ DigStairsCursor.select = function(self, square)
     BaseSquareCursor.select(self, square)
 end
 
-DigStairsCursor.isValid = function(self, square)
+---@param square IsoGridSquare
+---@return boolean
+DigStairsCursor.isValidInternal = function(self, square)
     if not square then
         return false
     end

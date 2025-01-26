@@ -27,7 +27,7 @@ DigCursor.select = function(self, square)
     BaseSquareCursor.select(self, square, Config.hideCursorAfterDigging:getValue())
 end
 
-DigCursor.isValid = function(self, square)
+DigCursor.isValidInternal = function(self, square)
     if not square then
         return false
     end
