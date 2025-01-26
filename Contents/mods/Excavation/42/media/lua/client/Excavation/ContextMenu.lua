@@ -5,6 +5,7 @@ local DigCursor = require("Excavation/DigCursor")
 local DigStairsCursor = require("Excavation/DigStairsCursor")
 local DiggingAPI = require("Excavation/DiggingAPI")
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
+local Version = require("Starlit/Version")
 
 local badColour = getCore():getBadHighlitedColor()
 badColour = table.newarray(badColour:getR(), badColour:getG(), badColour:getB())
@@ -204,5 +205,11 @@ ISRemoveSheetRope.complete = function(self)
 
     return old_complete(self)
 end
+
+-- TODO: temp, move this somewhere else
+Events.OnGameStart.Add(function()
+    -- 1.3.1 is required due to cursor isValidInternal only being added in that version
+    Version.ensureVersion(1, 3, 1)
+end)
 
 return ContextMenu
