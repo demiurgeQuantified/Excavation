@@ -40,6 +40,11 @@ DigCursor.isValidInternal = function(self, square)
     return DigSquareAction.canBePerformed(self.player, material, square)
 end
 
+DigCursor.getAPrompt = function(self)
+    local square = getSquare(self.xJoypad, self.yJoypad, self.zJoypad)
+    return self:isValid(square) and getText("IGUI_Excavation_DigWall") or nil
+end
+
 ---@param player IsoPlayer
 ---@return DigCursor
 DigCursor.new = function(player)
