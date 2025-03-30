@@ -16,7 +16,7 @@ local STAIRS_SPRITES_EAST = table.newarray(
     IsoSpriteManager.instance:getSprite("fixtures_excavation_01_0")
 )
 
----@class DigStairsCursor : Starlit.BaseSquareCursor
+---@class DigStairsCursor : starlit.BaseSquareCursor
 ---@field orientation "south"|"east"
 local DigStairsCursor = {}
 setmetatable(DigStairsCursor, BaseSquareCursor)
