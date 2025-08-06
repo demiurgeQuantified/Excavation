@@ -14,7 +14,7 @@ description=[/list]
 description=
 description=[h1]Known issues[/h1]
 description=[list]
-description=[*]Excavated areas are not considered indoors, so you will be rained on. This seems to be a hard limitation of the game, but I am still researching ways to bypass this.
+description=[*]Excavated areas are not considered indoors, so you will be rained on. This seems to be a hard limitation of the game, but I am still researching ways to bypass this. [url=https://steamcommunity.com/workshop/filedetails/discussion/3392001801/595156583817744399/]See the FAQ detailing why this is so complex.[/url]
 description=[*]Digging more than one layer down causes extreme visual bugs, so it is disabled by default.
 description=[*]Some flooring cannot be removed or dug through.
 description=[/list]
