@@ -1,5 +1,7 @@
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 local Eval = require("Excavation/Eval")
+local DynamicRoomDefs = require("Excavation/DynamicRoomDefs")
+
 
 -- oops... this file was meant to be in server... can't move it until a game update so just delay require lol
 ---@module "Excavation/ExcavationMetaGrid"
@@ -7,6 +9,7 @@ local ExcavationMetaGrid
 Events.OnInitGlobalModData.Add(function()
     ExcavationMetaGrid = require("Excavation/ExcavationMetaGrid")
 end)
+
 
 ---@param t table
 ---@return boolean
@@ -410,6 +413,8 @@ DiggingAPI.digSquare = function(x, y, z)
     buildUtil.setHaveConstruction(square, true)
 
     square:setSquareChanged()
+
+    DynamicRoomDefs.addSquare(square)
 
     for xOffset = -1, 1, 2 do
         for yOffset = -1, 1, 2 do
