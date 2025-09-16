@@ -152,7 +152,7 @@ function RoomBuilder:addSquareIfValid(x, y, z)
     if not self.seenSquares[hash] and MetaGrid.getSquare(x, y, z) then
         local currentSquare = getSquare(self.currentSquare.x, self.currentSquare.y, self.currentSquare.z)
         local square = getSquare(x, y, z)
-        if not currentSquare:isWallTo(square) then
+        if square and not currentSquare:isWallTo(square) then
             local pos = {x = x, y = y, z = z}
             if currentSquare:isDoorTo(square) or currentSquare:isWindowTo(square) then
                 table.insert(self.portals, pos)
