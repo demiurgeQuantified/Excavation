@@ -1,6 +1,6 @@
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 local Eval = require("Excavation/Eval")
-local DynamicRoomDefs = require("Excavation/DynamicRoomDefs")
+local DynamicRoomDefs = require("Excavation/dynamicBuildings/DynamicRoomDefs")
 
 
 -- oops... this file was meant to be in server... can't move it until a game update so just delay require lol
