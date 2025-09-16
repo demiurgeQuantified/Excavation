@@ -14,9 +14,9 @@ end
 
 
 ---@param room VirtualRoom
----@param x integer
----@param y integer
----@param z integer
+---@param x number
+---@param y number
+---@param z number
 ---@return boolean
 function Utils.isWithinRoom(room, x, y, z)
     for i = 1, #room.rects do
@@ -34,11 +34,12 @@ end
 
 
 ---@param building VirtualBuilding
----@param x integer
----@param y integer
----@param z integer
+---@param x number
+---@param y number
+---@param z number
 ---@return boolean
 function Utils.isWithinBuilding(building, x, y, z)
+    z = math.floor(z)
     for i = 1, #building.levels do
         local level = building.levels[i]
         if level.level == z then

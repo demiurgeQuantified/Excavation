@@ -1,8 +1,13 @@
+require("Starlit/utils/Reflection")
 local BuildingBuilder = require("Excavation/dynamicBuildings/BuildingBuilder")
 local MetaGrid = require("Excavation/dynamicBuildings/MetaGrid")
 local Utils = require("Excavation/dynamicBuildings/Utils")
 
+
 local BUILDING_EDITOR = BuildingRoomsEditor.getInstance()
+
+---@type ArrayList<IsoGenerator>
+local ALL_GENERATORS = IsoGenerator.new(nil).AllGenerators
 
 
 ---@namespace Excavation.dynamicBuildings
@@ -58,9 +63,9 @@ end
 local buildingsToAdd = table.newarray()
 
 
----@param x integer
----@param y integer
----@param z integer
+---@param x number
+---@param y number
+---@param z number
 ---@return boolean
 ---@nodiscard
 local function hasPendingBuilding(x, y, z)
@@ -79,6 +84,15 @@ local function instantiatePendingBuildings()
         for i = 1, #buildingsToAdd do
             instantiateBuilding(buildingsToAdd[i])
         end
+
+        -- make buildings that have generators in them toxic
+        for i = 0, ALL_GENERATORS:size() - 1 do
+            local generator = ALL_GENERATORS:get(i)
+            if hasPendingBuilding(generator:getX(), generator:getY(), generator:getZ()) then
+                generator:getSquare():getBuilding():setToxic(true)
+            end
+        end
+
         buildingsToAdd = table.newarray()
     end
 end
@@ -99,8 +113,6 @@ local function createBuildingOnSquare(x, y, z)
     end
 end
 
-
--- FIXME: building is not made toxic on reload because generator is already on before the building is created
 
 Events.LoadGridsquare.Add(function(square)
     local x = square:getX()
@@ -143,10 +155,11 @@ end
 
 local DynamicRoomDefs = {}
 
+-- FIXME: if a building is partially loaded, when it becomes fully loaded the partial building will sometimes remain
+--  overlapping with the full building
 
--- FIXME: as the excavated area is a separate building, fumes do not spread from it to an above ground structure or vanilla basement
---  if possible, merge the actual building and the basement into one
---  else just propagate the toxic status to neighbours
+-- as the excavated area is a separate building, fumes do not spread from it to an above ground structure
+--  this is also the vanilla behaviour so it may be fine to just ignore for consistency
 
 ---@param square IsoGridSquare
 function DynamicRoomDefs.addSquare(square)
