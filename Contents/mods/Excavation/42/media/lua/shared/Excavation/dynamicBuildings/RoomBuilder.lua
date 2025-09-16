@@ -195,6 +195,16 @@ function RoomBuilder.buildRoomFrom(x, y, z)
         builder:addSquareIfValid(x, y + 1, z)
         builder:addSquareIfValid(x, y - 1, z)
 
+        local square = getSquare(x, y, z)
+        if not square:hasFloor() and getSquare(x, y, z - 1) then
+            table.insert(builder.portals, {x = x, y = y, z = z - 1})
+        end
+
+        local aboveSquare = getSquare(x, y, z + 1)
+        if aboveSquare and not aboveSquare:hasFloor() then
+            table.insert(builder.portals, {x = x, y = y, z = z + 1})
+        end
+
         table.insert(squares, builder.currentSquare)
     end
 

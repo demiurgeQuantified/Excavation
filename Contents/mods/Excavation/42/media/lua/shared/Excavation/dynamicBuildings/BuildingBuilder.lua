@@ -45,7 +45,7 @@ function BuildingBuilder:buildRoom(x, y, z)
 
     for i = 1, #room.portals do
         local portalPos = room.portals[i]
-        if not self:getRoomAt(portalPos.x, portalPos.y, portalPos.z) then
+        if portalPos.z < 0 and not self:getRoomAt(portalPos.x, portalPos.y, portalPos.z) then
             self:buildRoom(portalPos.x, portalPos.y, portalPos.z)
         end
     end
