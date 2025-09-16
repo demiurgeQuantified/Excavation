@@ -22,49 +22,6 @@ end
 
 -- TODO: it might just be necessary to refresh every time the player changes negative z level lol
 
----@type table<integer, table<integer, table<integer, true>>>
-local invalidatedChunkLevels = {}
-
-Events.OnTick.Add(function()
-    for i = 0, getNumActivePlayers() - 1 do
-        local player = getSpecificPlayer(i)
-        if player then
-            local z = math.floor(player:getZ())
-            if invalidatedChunkLevels[z] then
-                local zChunks = invalidatedChunkLevels[z]
-                local chunk = player:getChunk()
-                local x = chunk.wx
-                if zChunks[x] then
-                    local y = chunk.wy
-                    if zChunks[x][y] then
-                        chunk:invalidateRenderChunkLevel(z, FBORenderChunk.DIRTY_OBJECT_ADD)
-                        zChunks[x][y] = nil
-                        --print(string.format("[Excavation] Refreshed chunk %d,%d,%d", x, y, z))
-                        -- cleanup extra memory
-                        if isEmpty(zChunks[x]) then
-                            zChunks[x] = nil
-                            if isEmpty(zChunks) then
-                                invalidatedChunkLevels[z] = nil
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end)
-
----@param x integer
----@param y integer
----@param z integer
-local queueChunkRefresh = function(x, y, z)
-    x = (x - x % 8) / 8
-    y = (y - y % 8) / 8
-    invalidatedChunkLevels[z] = invalidatedChunkLevels[z] or {}
-    invalidatedChunkLevels[z][x] = invalidatedChunkLevels[z][x] or {}
-    invalidatedChunkLevels[z][x][y] = true
-    --print(string.format("[Excavation] Queued chunk refresh %d,%d,%d", x, y, z))
-end
 
 local DiggingAPI = {}
 
@@ -175,7 +132,7 @@ local objectSpriteBlacklist = {
 }
 
 local removeBlacklistedObjects = function(square)
-    local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
+    local objects = square:getLuaTileObjectList() ---@as IsoObject[]
     for i = #objects, 1, -1 do
         local object = objects[i]
         if objectSpriteBlacklist[object:getSprite():getName()] then
@@ -265,7 +222,7 @@ DiggingAPI.isSquareClear = function(square, orientation, exclude)
 
     if orientation then
         local isSouth = orientation == "south"
-        local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
+        local objects = square:getLuaTileObjectList() ---@as IsoObject[]
         for i = 1, #objects do
             local object = objects[i]
             local sprite = object:getSprite()
@@ -323,7 +280,9 @@ end
 DiggingAPI.digSquare = function(x, y, z)
     local square = IsoObjectUtils.getOrCreateSquare(x, y, z)
 
-    -- TODO: digging east doesn't create an SE corner
+    -- FIXME: digging east creates SE corners inside real walls
+
+    -- FIXME: digging east doesn't create an SE corner ?? old comment idk what this means
 
     removeBlacklistedObjects(square)
 
@@ -376,6 +335,7 @@ DiggingAPI.digSquare = function(x, y, z)
     if isDugOpen(northSquare) then
         digWall(square, "north")
         removeCorner(eastSquare)
+        -- square to west has north wall and square to north has west wall
         needsCornerAdded = needsCornerAdded and IsoObjectUtils.getWall(square, "west") ~= nil
     else
         addWall(square, wallMaterial, "north")
@@ -425,7 +385,6 @@ DiggingAPI.digSquare = function(x, y, z)
         end
     end
 
-    queueChunkRefresh(x, y, z)
 end
 
 return DiggingAPI

@@ -171,8 +171,6 @@ end
 ---@return VirtualRoom
 ---@nodiscard
 function RoomBuilder.buildRoomFrom(x, y, z)
-    assert(MetaGrid.getSquare(x, y, z) == true, "attempted to create virtual room at non-excavated square")
-
     ---@type Position[]
     local squares = table.newarray()
 
