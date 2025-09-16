@@ -114,6 +114,7 @@ local function mergeNeighbouringStrips(strips)
 
     -- add maxX rects that were missed by the previous loop
     for i = 1, #rectsByX[maxX] do
+        ---@diagnostic disable-next-line: need-check-nil
         local rect = rectsByX[maxX][i]
         if rect.x == maxX then
             table.insert(mergedRects, rect)
@@ -205,6 +206,7 @@ end
 
 
 ---@return RoomBuilder
+---@nodiscard
 function RoomBuilder.new()
     local o = setmetatable(
         {
