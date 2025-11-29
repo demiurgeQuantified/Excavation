@@ -31,5 +31,5 @@ description=Italian translation by [url=https://steamcommunity.com/profiles/7656
 description=Thai translation by [url=https://steamcommunity.com/id/Overlord101TH]Overlord[/url]
 description=
 description=[url=https://github.com/demiurgeQuantified/Excavation]View on GitHub[/url]
-tags=Build 42;Building;Misc;Realistic;WIP
+tags=Build 42;Building;Misc;Realistic;WIP;Multiplayer
 visibility=public
