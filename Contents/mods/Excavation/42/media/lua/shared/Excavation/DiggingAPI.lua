@@ -1,16 +1,23 @@
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 local Eval = require("Excavation/Eval")
 
--- oops... this file was meant to be in server... can't move it until a game update so just delay require lol
+local CLIENT = isClient()
+
 ---@module "Excavation/ExcavationMetaGrid"
 local ExcavationMetaGrid
-Events.OnInitGlobalModData.Add(function()
-    ExcavationMetaGrid = require("Excavation/ExcavationMetaGrid")
-end)
+
+-- TODO: functions that require this cannot be called by the client and should be moved into a separate module
+if not CLIENT then
+    Events.OnInitGlobalModData.Add(function()
+        ExcavationMetaGrid = require("Excavation/ExcavationMetaGrid")
+    end)
+end
+
 
 ---@param t table
 ---@return boolean
-local isEmpty = function(t)
+---@nodiscard
+local function isEmpty(t)
     for _,_ in pairs(t) do
         return false
     end
@@ -20,8 +27,9 @@ end
 
 -- TODO: it might just be necessary to refresh every time the player changes negative z level lol
 
----@type table<integer, table<integer, table<integer, true>>>
+---@type table<integer, table<integer, starlit.Set<integer>?>?>
 local invalidatedChunkLevels = {}
+
 
 Events.OnTick.Add(function()
     for i = 0, getNumActivePlayers() - 1 do
@@ -31,9 +39,9 @@ Events.OnTick.Add(function()
             if invalidatedChunkLevels[z] then
                 local zChunks = invalidatedChunkLevels[z]
                 local chunk = player:getChunk()
-                local x = chunk.wx
+                local x = chunk.wx ---@as integer
                 if zChunks[x] then
-                    local y = chunk.wy
+                    local y = chunk.wy ---@as integer
                     if zChunks[x][y] then
                         chunk:invalidateRenderChunkLevel(z, FBORenderChunk.DIRTY_OBJECT_ADD)
                         zChunks[x][y] = nil
@@ -52,10 +60,11 @@ Events.OnTick.Add(function()
     end
 end)
 
+
 ---@param x integer
 ---@param y integer
 ---@param z integer
-local queueChunkRefresh = function(x, y, z)
+local function queueChunkRefresh(x, y, z)
     x = (x - x % 8) / 8
     y = (y - y % 8) / 8
     invalidatedChunkLevels[z] = invalidatedChunkLevels[z] or {}
@@ -63,6 +72,7 @@ local queueChunkRefresh = function(x, y, z)
     invalidatedChunkLevels[z][x][y] = true
     --print(string.format("[Excavation] Queued chunk refresh %d,%d,%d", x, y, z))
 end
+
 
 local DiggingAPI = {}
 
@@ -101,7 +111,7 @@ DiggingAPI.STONE = {
 }
 
 
----@type table<string, true | nil>
+---@type starlit.Set<string>
 local DIGGABLE_SPRITES = {}
 
 for _, sprite in pairs(DiggingAPI.DIRT) do
@@ -120,7 +130,7 @@ DiggingAPI.STONE_LEVEL = -2
 ---@param y integer
 ---@param z integer
 ---@param material DiggingAPI.MaterialDefinition
-local addCornerIfNeeded = function(x, y, z, material)
+local function addCornerIfNeeded(x, y, z, material)
     -- FIXME: why is this adding corners when digging behind a wall?
     local square = IsoObjectUtils.getOrCreateSquare(x, y, z)
     if not square:getWall() then
@@ -129,8 +139,9 @@ local addCornerIfNeeded = function(x, y, z, material)
     end
 end
 
+
 ---@param square IsoGridSquare
-local removeCorner = function(square)
+local function removeCorner(square)
     local corner = square:getWallSE()
     if not corner then return end
     local spriteName = corner:getSprite():getName()
@@ -140,9 +151,10 @@ local removeCorner = function(square)
     end
 end
 
+
 ---@param square IsoGridSquare
 ---@param side "north"|"west"
-local digWall = function(square, side)
+local function digWall(square, side)
     -- TODO: optimise this, this searches for the wall twice
     local wall = IsoObjectUtils.getWall(square, side)
     if wall and DIGGABLE_SPRITES[wall:getSprite():getName()] then
@@ -150,10 +162,11 @@ local digWall = function(square, side)
     end
 end
 
+
 ---@param square IsoGridSquare
 ---@param material DiggingAPI.MaterialDefinition
 ---@param side "north"|"west"
-local addWall = function(square, material, side)
+local function addWall(square, material, side)
     if IsoObjectUtils.getWall(square, side) then
         return
     end
@@ -175,13 +188,16 @@ local addWall = function(square, material, side)
     removeCorner(square)
 end
 
+
+---@type starlit.Set<string>
 local objectSpriteBlacklist = {
     ["underground_01_0"] = true,
     ["underground_01_1"] = true
 }
 
-local removeBlacklistedObjects = function(square)
-    local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
+
+local function removeBlacklistedObjects(square)
+    local objects = square:getLuaTileObjectList() --[=[@as IsoObject[] ]=]
     for i = #objects, 1, -1 do
         local object = objects[i]
         if objectSpriteBlacklist[object:getSprite():getName()] then
@@ -191,16 +207,18 @@ local removeBlacklistedObjects = function(square)
     end
 end
 
+
 ---@param square IsoGridSquare
 ---@return boolean
-local isDugOpen = function(square)
+local function isDugOpen(square)
     return square:hasFloor() or ExcavationMetaGrid.isFloorRemoved(square)
 end
+
 
 ---@param character IsoGameCharacter
 ---@param material "dirt"|"stone"
 ---@return boolean canDig, string? reason
-DiggingAPI.characterCanDig = function(character, material)
+function DiggingAPI.characterCanDig(character, material)
     if character:getMoodles():getMoodleLevel(MoodleType.ENDURANCE) > 1 then
         return false, "Tooltip_Excavation_TooExhausted"
     end
@@ -220,17 +238,21 @@ DiggingAPI.characterCanDig = function(character, material)
     return true
 end
 
+
 ---@param square IsoGridSquare
 ---@return "dirt"|"stone"|nil
-DiggingAPI.getMaterialAt = function(square)
+---@nodiscard
+function DiggingAPI.getMaterialAt(square)
     return DiggingAPI.getMaterialAtCoords(square:getX(), square:getY(), square:getZ())
 end
+
 
 ---@param x integer
 ---@param y integer
 ---@param z integer
 ---@return "dirt"|"stone"|nil
-DiggingAPI.getMaterialAtCoords = function(x, y, z)
+---@nodiscard
+function DiggingAPI.getMaterialAtCoords(x, y, z)
     -- eventually this could be rewritten to e.g. return ores in specific locations
     if z >= 0 then
         return nil
@@ -242,14 +264,17 @@ DiggingAPI.getMaterialAtCoords = function(x, y, z)
     end
 end
 
-DiggingAPI.digFloor = function(square)
+
+function DiggingAPI.digFloor(square)
+    assert(not CLIENT, "functions that modify terrain cannot be called on the client")
     IsoObjectUtils.removeFloor(square)
     IsoObjectUtils.removeAll(square, IsoFlagType.canBeRemoved)
     ExcavationMetaGrid.onFloorRemoved(square)
 end
 
+
 ---@param floor IsoObject
-DiggingAPI.isDiggableFloor = function(floor)
+function DiggingAPI.isDiggableFloor(floor)
     local spriteName = floor:getSprite():getName()
     if spriteName == DiggingAPI.STONE.floor
             or luautils.stringStarts(spriteName, "floors_exterior_natural")
@@ -259,11 +284,13 @@ DiggingAPI.isDiggableFloor = function(floor)
     return false
 end
 
+
 ---@param square IsoGridSquare
 ---@param orientation "south"|"east"|nil
 ---@param exclude IsoMovingObject?
 ---@return boolean
-DiggingAPI.isSquareClear = function(square, orientation, exclude)
+---@nodiscard
+function DiggingAPI.isSquareClear(square, orientation, exclude)
     -- FIXME: even grass has this lol
     if square:has("BlocksPlacement") then
         return false
@@ -288,9 +315,11 @@ DiggingAPI.isSquareClear = function(square, orientation, exclude)
     return #movingObjects == 0 or (#movingObjects == 1 and movingObjects[1] == exclude)
 end
 
+
 ---@param square IsoGridSquare
 ---@return boolean
-DiggingAPI.canDigDownFrom = function(square)
+---@nodiscard
+function DiggingAPI.canDigDownFrom(square)
     local z = square:getZ()
     ---@diagnostic disable-next-line: undefined-field
     if z <= -32 or (z <= -1 and not SandboxVars.Excavation.DisableDepthLimit) then
@@ -312,9 +341,10 @@ DiggingAPI.canDigDownFrom = function(square)
     return true
 end
 
+
 ---@param square IsoGridSquare
 ---@return boolean, string?
-DiggingAPI.canDig = function(square)
+function DiggingAPI.canDig(square)
     local x, y, z = square:getX(), square:getY(), square:getZ()
     local aboveSquare = getSquare(x, y, z + 1)
     if aboveSquare and aboveSquare:isWaterSquare() then
@@ -323,10 +353,13 @@ DiggingAPI.canDig = function(square)
     return true
 end
 
+
 ---@param x integer
 ---@param y integer
 ---@param z integer
-DiggingAPI.digSquare = function(x, y, z)
+function DiggingAPI.digSquare(x, y, z)
+    assert(not CLIENT, "functions that modify terrain cannot be called on the client")
+
     local square = IsoObjectUtils.getOrCreateSquare(x, y, z)
 
     -- TODO: digging east doesn't create an SE corner
@@ -432,5 +465,6 @@ DiggingAPI.digSquare = function(x, y, z)
 
     queueChunkRefresh(x, y, z)
 end
+
 
 return DiggingAPI
