@@ -1,18 +1,25 @@
 local Eval = {}
 
----@type ItemContainer_Predicate
+
+---@param item InventoryItem
+---@return boolean
 Eval.canCarryDirt = function(item)
-    return item:hasTag("HoldDirt")
+    return item:hasTag(ItemTag.HOLD_DIRT)
 end
 
----@type ItemContainer_Predicate
+
+---@param item InventoryItem
+---@return boolean
 Eval.canDigDirt = function(item)
-    return item:hasTag("DigGrave") and not item:isBroken()
+    return item:hasTag(ItemTag.DIG_GRAVE) and not item:isBroken()
 end
 
----@type ItemContainer_Predicate
+
+---@param item InventoryItem
+---@return boolean
 Eval.canDigStone = function(item)
-    return item:hasTag("PickAxe") and not item:isBroken()
+    return item:hasTag(ItemTag.PICK_AXE) and not item:isBroken()
 end
+
 
 return Eval

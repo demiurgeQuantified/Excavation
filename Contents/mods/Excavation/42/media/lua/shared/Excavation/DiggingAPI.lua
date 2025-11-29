@@ -17,6 +17,7 @@ local isEmpty = function(t)
     return true
 end
 
+
 -- TODO: it might just be necessary to refresh every time the player changes negative z level lol
 
 ---@type table<integer, table<integer, table<integer, true>>>
@@ -65,12 +66,14 @@ end
 
 local DiggingAPI = {}
 
+
 ---@class DiggingAPI.MaterialDefinition
 ---@field wallNorth string
 ---@field wallWest string
 ---@field wallCornerNorthwest string
 ---@field wallCornerSoutheast string
 ---@field floor string
+
 
 ---@type DiggingAPI.MaterialDefinition
 DiggingAPI.DIRT = {
@@ -80,6 +83,7 @@ DiggingAPI.DIRT = {
     wallCornerSoutheast = "walls_underground_dirt_3",
     floor = "blends_natural_01_64"
 }
+
 
 -- TODO: these need to be different (even if identical) sprites from vanilla so they can be distinguished
 ---@type DiggingAPI.MaterialDefinition
@@ -96,16 +100,21 @@ DiggingAPI.STONE = {
     -- floor = "floors_exterior_natural_01_10"
 }
 
----@type {string : true}
+
+---@type table<string, true | nil>
 local DIGGABLE_SPRITES = {}
+
 for _, sprite in pairs(DiggingAPI.DIRT) do
     DIGGABLE_SPRITES[sprite] = true
 end
+
 for _, sprite in pairs(DiggingAPI.STONE) do
     DIGGABLE_SPRITES[sprite] = true
 end
 
+
 DiggingAPI.STONE_LEVEL = -2
+
 
 ---@param x integer
 ---@param y integer
@@ -192,7 +201,7 @@ end
 ---@param material "dirt"|"stone"
 ---@return boolean canDig, string? reason
 DiggingAPI.characterCanDig = function(character, material)
-    if character:getMoodles():getMoodleLevel(MoodleType.Endurance) > 1 then
+    if character:getMoodles():getMoodleLevel(MoodleType.ENDURANCE) > 1 then
         return false, "Tooltip_Excavation_TooExhausted"
     end
 
@@ -256,21 +265,20 @@ end
 ---@return boolean
 DiggingAPI.isSquareClear = function(square, orientation, exclude)
     -- FIXME: even grass has this lol
-    if square:Is("BlocksPlacement") then
+    if square:has("BlocksPlacement") then
         return false
     end
 
     if orientation then
         local isSouth = orientation == "south"
-        local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
+        local objects = square:getLuaTileObjectList() --[=[@as IsoObject[] ]=]
         for i = 1, #objects do
             local object = objects[i]
             local sprite = object:getSprite()
             -- copied from buildutils U_U
-            if (sprite and sprite:getProperties():Is(isSouth and IsoFlagType.collideN or IsoFlagType.collideW))
-                    or ((instanceof(object, "IsoThumpable") and object:getNorth() == isSouth) and not object:isCorner() and not object:isFloor())
-                    or (instanceof(object, "IsoWindow") and object:getNorth() == isSouth)
-                    or (instanceof(object, "IsoDoor") and object:getNorth() == isSouth) then
+            if (sprite and sprite:getProperties():has(isSouth and IsoFlagType.collideN or IsoFlagType.collideW))
+                    or (instanceof(object, "BarricadeAble") and object--[[@as BarricadeAble]]:getNorth() == isSouth
+                        and ((not instanceof(object, "IsoThumpable")) or (not object--[[@as IsoThumpable]]:isCorner()) and not object:isFloor())) then
                 return false
             end
         end
@@ -284,6 +292,7 @@ end
 ---@return boolean
 DiggingAPI.canDigDownFrom = function(square)
     local z = square:getZ()
+    ---@diagnostic disable-next-line: undefined-field
     if z <= -32 or (z <= -1 and not SandboxVars.Excavation.DisableDepthLimit) then
         return false
     end
@@ -414,6 +423,7 @@ DiggingAPI.digSquare = function(x, y, z)
     for xOffset = -1, 1, 2 do
         for yOffset = -1, 1, 2 do
             local cornerSquare = getSquare(x + xOffset, y + yOffset, z)
+            ---@diagnostic disable-next-line: unnecessary-if
             if cornerSquare then
                 removeBlacklistedObjects(square)
             end

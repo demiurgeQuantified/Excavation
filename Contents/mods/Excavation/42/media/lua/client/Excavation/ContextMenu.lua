@@ -7,9 +7,11 @@ local DiggingAPI = require("Excavation/DiggingAPI")
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 local Version = require("Starlit/Version")
 
+
 local badColour = getCore():getBadHighlitedColor()
 badColour = table.newarray(badColour:getR(), badColour:getG(), badColour:getB())
 local badColourString = string.format(" <RGB:%f,%f,%f> ", badColour[1], badColour[2], badColour[3])
+
 
 local ContextMenu = {}
 
@@ -50,6 +52,7 @@ end
 ---@param context ISContextMenu
 ContextMenu.doDigStairsOption = function(player, square, context)
     local z = square:getZ()
+    ---@diagnostic disable-next-line: undefined-field
     if z <= -1 and not SandboxVars.Excavation.DisableDepthLimit or z <= -32 then
         return
     end
@@ -74,22 +77,23 @@ end
 ContextMenu.fixMissingSheetRopeOption = function(player, context)
     -- mostly just copy pasted from vanilla since it's a temp fix anyway
     local fetch = ISWorldObjectContextMenu.fetchVars
+    ---@type IsoObject
     local hoppableObject = fetch.hoppableN or fetch.hoppableW or fetch.thumpableWindow
 
     local inventory = player:getInventory()
 
     if hoppableObject ~= nil and not fetch.invincibleWindow and not fetch.window then
         if hoppableObject:canAddSheetRope() and player:getCurrentSquare():getZ() <= 0 and
-                (hoppableObject:getSprite():getProperties():Is("TieSheetRope") or (inventory:containsTypeRecurse("Nails") and inventory:containsTypeRecurse("Hammer"))) then
+                (hoppableObject:getSprite():getProperties():has("TieSheetRope") or (inventory:containsTypeRecurse("Nails") and inventory:containsTypeRecurse("Hammer"))) then
             if (inventory:getItemCountRecurse("SheetRope") >= hoppableObject:countAddSheetRope()) then
-                if hoppableObject:getSprite():getProperties():Is("TieSheetRope") then
+                if hoppableObject:getSprite():getProperties():has("TieSheetRope") then
                     context:addGetUpOption(getText("ContextMenu_Tie_escape_rope_sheet"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), true);
                 else
                     context:addGetUpOption(getText("ContextMenu_Nail_escape_rope_sheet"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), true);
                 end
             end
             if (inventory:getItemCountRecurse("Rope") >= hoppableObject:countAddSheetRope()) then
-                if hoppableObject:getSprite():getProperties():Is("TieSheetRope") then
+                if hoppableObject:getSprite():getProperties():has("TieSheetRope") then
                     context:addGetUpOption(getText("ContextMenu_Tie_escape_rope"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), false);
                 else
                     context:addGetUpOption(getText("ContextMenu_Nail_escape_rope"), nil, ISWorldObjectContextMenu.onAddSheetRope, hoppableObject, player:getIndex(), false);
@@ -187,10 +191,10 @@ ISRemoveSheetRope.complete = function(self)
                 return old_complete(self)
             end
 
-            local objects = square:getLuaTileObjectList() --[=[@as IsoObject[]]=]
+            local objects = square:getLuaTileObjectList() --[=[@as IsoObject[] ]=]
             for j = 1, #objects do
                 local object = objects[j]
-                if object:getProperties():Is(deleteProperty) then
+                if object:hasProperty(deleteProperty) then
                     square:transmitRemoveItemFromSquare(object)
                     self.character:getInventory():AddItem(object:getName())
                     break

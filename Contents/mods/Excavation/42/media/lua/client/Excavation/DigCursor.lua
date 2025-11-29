@@ -4,21 +4,26 @@ local DiggingAPI = require("Excavation/DiggingAPI")
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 local Config = require("Excavation/Config")
 
----@type {string : true}
+
+---@type table<string, true | nil>
 local DIGGABLE_SPRITES = {}
+
 for _, sprite in pairs(DiggingAPI.DIRT) do
     DIGGABLE_SPRITES[sprite] = true
 end
+
 for _, sprite in pairs(DiggingAPI.STONE) do
     DIGGABLE_SPRITES[sprite] = true
 end
+
 
 ---@class DigCursor : starlit.BaseSquareCursor
 local DigCursor = {}
 setmetatable(DigCursor, BaseSquareCursor)
 DigCursor.__index = DigCursor
 
-DigCursor.select = function(self, square)
+
+function DigCursor:select(square)
     local z = square:getZ()
     DigSquareAction.queueNew(
         self.player, square:getX(), square:getY(), z,
@@ -27,7 +32,8 @@ DigCursor.select = function(self, square)
     BaseSquareCursor.select(self, square, Config.hideCursorAfterDigging)
 end
 
-DigCursor.isValidInternal = function(self, square)
+
+function DigCursor:isValidInternal(square)
     if not square then
         return false
     end
@@ -37,22 +43,26 @@ DigCursor.isValidInternal = function(self, square)
         return false
     end
 
-    return DigSquareAction.canBePerformed(self.player, material, square)
+    local result = DigSquareAction.canBePerformed(self.player, material, square)
+    return result
 end
 
-DigCursor.getAPrompt = function(self)
+
+function DigCursor:getAPrompt()
     local square = getSquare(self.xJoypad, self.yJoypad, self.zJoypad)
     return self:isValid(square) and getText("IGUI_Excavation_DigWall") or nil
 end
 
+
 ---@param player IsoPlayer
 ---@return DigCursor
-DigCursor.new = function(player)
+function DigCursor.new(player)
     local o = BaseSquareCursor.new(player)
     setmetatable(o, DigCursor) ---@cast o DigCursor
 
     return o
 end
+
 
 -- fixes the annoying blocks spawning when you click out of bounds
 Events.OnDoTileBuilding2.Add(function(cursor, bRender,
@@ -61,6 +71,7 @@ Events.OnDoTileBuilding2.Add(function(cursor, bRender,
     for x = x - 1, x + 1 do
         for y = y - 1, y + 1 do
             local square = getSquare(x, y, z)
+            ---@diagnostic disable-next-line: unnecessary-if
             if square then
                 square:removeUnderground()
             end
@@ -68,12 +79,13 @@ Events.OnDoTileBuilding2.Add(function(cursor, bRender,
     end
 end)
 
+
 -- evil server folder client code
 Events.OnInitGlobalModData.Add(function()
     -- don't allow sledgehammering dirt/stone tiles
     local old_canDestroy = ISDestroyCursor.canDestroy
     ---@param object IsoObject
-    ISDestroyCursor.canDestroy = function(self, object)
+    function ISDestroyCursor:canDestroy(object)
         local spriteName = object:getSprite():getName()
         if spriteName and DIGGABLE_SPRITES[spriteName] then
             return false
@@ -83,12 +95,13 @@ Events.OnInitGlobalModData.Add(function()
     end
 end)
 
+
 -- replace sledgehammered exterior walls underground with dirt/stone
 local old_complete = ISDestroyStuffAction.complete
-ISDestroyStuffAction.complete = function(self)
+function ISDestroyStuffAction:complete()
     local originalReturnValue = old_complete(self)
 
-    local square = self.item--[[@as IsoObject]]:getSquare()
+    local square = self.item:getSquare()
     local z = square:getZ()
     if z >= 0 then
         return originalReturnValue
@@ -96,9 +109,8 @@ ISDestroyStuffAction.complete = function(self)
 
     local hasFloor = square:hasFloor()
     local material = z > DiggingAPI.STONE_LEVEL and DiggingAPI.DIRT or DiggingAPI.STONE
-    local properties = self.item--[[@as IsoObject]]:getProperties()
     local sprite
-    if properties:Is(IsoFlagType.WallN) then
+    if self.item:hasProperty(IsoFlagType.WallN) then
         local neighbour = square:getAdjacentSquare(IsoDirections.N)
         if not hasFloor or not neighbour:hasFloor() then
             local westWall = IsoObjectUtils.getWall(square, "west")
@@ -117,10 +129,17 @@ ISDestroyStuffAction.complete = function(self)
                     and (DIGGABLE_SPRITES[westWall:getSprite():getName()]
                         or DIGGABLE_SPRITES[northWall:getSprite():getName()]) then
                 square:transmitAddObjectToSquare(
-                    IsoObject.getNew(square, material.wallCornerSoutheast, "", false), -1)
+                    IsoObject.getNew(
+                        square,
+                        material.wallCornerSoutheast,
+                        "",
+                        false
+                    ),
+                    -1
+                )
             end
         end
-    elseif properties:Is(IsoFlagType.WallW) then
+    elseif self.item:hasProperty(IsoFlagType.WallW) then
         local neighbour = square:getAdjacentSquare(IsoDirections.W)
         if not hasFloor or not neighbour:hasFloor() then
             local northWall = IsoObjectUtils.getWall(square, "north")
@@ -137,14 +156,21 @@ ISDestroyStuffAction.complete = function(self)
                     and (DIGGABLE_SPRITES[northWall:getSprite():getName()]
                         or DIGGABLE_SPRITES[westWall:getSprite():getName()]) then
                 square:transmitAddObjectToSquare(
-                    IsoObject.getNew(square, material.wallCornerSoutheast, "", false), -1)
+                    IsoObject.getNew(
+                        square,
+                        material.wallCornerSoutheast,
+                        "",
+                        false
+                    ),
+                    -1
+                )
             end
         end
-    elseif properties:Is(IsoFlagType.WallSE) then
+    elseif self.item:hasProperty(IsoFlagType.WallSE) then
         if not hasFloor or not square:getAdjacentSquare(IsoDirections.NW):hasFloor() then
             sprite = material.wallCornerSoutheast
         end
-    elseif properties:Is(IsoFlagType.WallNW) then
+    elseif self.item:hasProperty(IsoFlagType.WallNW) then
         if self.cornerCounter == 0 then -- north
             if not hasFloor or not square:getAdjacentSquare(IsoDirections.N):hasFloor() then
                 sprite = material.wallNorth
@@ -156,10 +182,18 @@ ISDestroyStuffAction.complete = function(self)
 
     if sprite then
         square:transmitAddObjectToSquare(
-            IsoObject.getNew(square, sprite, "", false), -1)
+            IsoObject.getNew(
+                square,
+                sprite,
+                "",
+                false
+            ),
+            -1
+        )
     end
 
     return originalReturnValue
 end
+
 
 return DigCursor
