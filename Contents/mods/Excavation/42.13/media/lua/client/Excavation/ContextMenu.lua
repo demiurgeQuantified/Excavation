@@ -119,7 +119,10 @@ ContextMenu.fixMissingSheetRopeOption = function(player, context)
     end
 end
 
----@type Callback_OnFillWorldObjectContextMenu
+---@param playerNum integer
+---@param context ISContextMenu
+---@param worldObjects IsoObject[]
+---@param test boolean
 ContextMenu.fillContextMenu = function(playerNum, context, worldObjects, test)
     local player = getSpecificPlayer(playerNum)
 
@@ -138,10 +141,18 @@ ContextMenu.fillContextMenu = function(playerNum, context, worldObjects, test)
     end
 
     if square:getZ() <= 0 then
-        local digSubmenu = ISContextMenu:getNew(context)
-        context:addSubMenu(
-            context:addOption(getText("IGUI_Excavation_Dig")),
-            digSubmenu)
+        local digSubmenu
+
+        local shovelMenu = context:getOptionFromName(getText("ContextMenu_Shovel"))
+        if shovelMenu and shovelMenu.subOption ~= nil then
+            digSubmenu = context:getSubInstance(shovelMenu.subOption)
+        else
+            digSubmenu = ISContextMenu:getNew(context)
+            context:addSubMenu(
+                context:addOption(getText("IGUI_Excavation_Dig")),
+                digSubmenu
+            )
+        end
 
         ContextMenu.doDigWallOption(player, square, digSubmenu)
         ContextMenu.doDigStairsOption(player, square, digSubmenu)
