@@ -223,8 +223,8 @@ end
 
 -- TODO: temp, move this somewhere else
 Events.OnGameStart.Add(function()
-    -- 1.3.1 is required due to cursor isValidInternal only being added in that version
-    Version.ensureVersion(1, 3, 1)
+    -- 1.4.5 is required due to previous versions not being compatible with 42.13
+    Version.ensureVersion(1, 4, 5)
 end)
 
 return ContextMenu
