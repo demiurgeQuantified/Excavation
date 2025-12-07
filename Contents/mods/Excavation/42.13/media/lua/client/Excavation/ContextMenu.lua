@@ -5,7 +5,6 @@ local DigCursor = require("Excavation/DigCursor")
 local DigStairsCursor = require("Excavation/DigStairsCursor")
 local DiggingAPI = require("Excavation/DiggingAPI")
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
-local Version = require("Starlit/Version")
 
 
 local badColour = getCore():getBadHighlitedColor()
@@ -146,7 +145,9 @@ ContextMenu.fillContextMenu = function(playerNum, context, worldObjects, test)
         local shovelMenu = context:getOptionFromName(getText("ContextMenu_Shovel"))
         if shovelMenu and shovelMenu.subOption ~= nil then
             digSubmenu = context:getSubInstance(shovelMenu.subOption)
-        else
+        end
+        
+        if not digSubmenu then
             digSubmenu = ISContextMenu:getNew(context)
             context:addSubMenu(
                 context:addOption(getText("IGUI_Excavation_Dig")),
@@ -221,10 +222,5 @@ ISRemoveSheetRope.complete = function(self)
     return old_complete(self)
 end
 
--- TODO: temp, move this somewhere else
-Events.OnGameStart.Add(function()
-    -- 1.4.5 is required due to previous versions not being compatible with 42.13
-    Version.ensureVersion(1, 4, 5)
-end)
 
 return ContextMenu
