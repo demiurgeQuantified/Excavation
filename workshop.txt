@@ -1,6 +1,6 @@
 version=1
 id=3392001801
-title=Excavation - Basement Expansion
+title=[42] Excavation - Basement Expansion
 description=Allows digging through walls to create and expand basements. To dig, you need a shovel and some sacks to carry the dug out dirt in. You will need to sledgehammer any walls or pull up any flooring in the way first. Digging will tire you out very quickly.
 description=
 description=[h1]Future features[/h1]
@@ -29,7 +29,8 @@ description=Spanish translation by [url=https://steamcommunity.com/id/Veloxyz]Ve
 description=Turkish translation by [url=https://steamcommunity.com/id/bayglitch]BayGlitch[/url]
 description=Italian translation by [url=https://steamcommunity.com/profiles/76561199103405087]Gabbo990[/url]
 description=Thai translation by [url=https://steamcommunity.com/id/Overlord101TH]Overlord[/url]
+description=Korean translation by [url=https://steamcommunity.com/profiles/76561198062695591]Hx[/url]
 description=
 description=[url=https://github.com/demiurgeQuantified/Excavation]View on GitHub[/url]
-tags=Build 42;Building;Misc;Realistic;WIP
+tags=Build 42;Building;Misc;Multiplayer;Realistic;WIP
 visibility=public

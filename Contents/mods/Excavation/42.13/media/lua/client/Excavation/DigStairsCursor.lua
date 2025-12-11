@@ -16,20 +16,22 @@ local STAIRS_SPRITES_EAST = table.newarray(
     IsoSpriteManager.instance:getSprite("fixtures_excavation_01_0")
 )
 
----@class DigStairsCursor : Starlit.BaseSquareCursor
+---@class DigStairsCursor : starlit.BaseSquareCursor
 ---@field orientation "south"|"east"
 local DigStairsCursor = {}
 setmetatable(DigStairsCursor, BaseSquareCursor)
 DigStairsCursor.__index = DigStairsCursor
 
-DigStairsCursor.select = function(self, square)
+
+function DigStairsCursor:select(square)
     DigStairsAction.queueNew(self.player, square, self.orientation)
     BaseSquareCursor.select(self, square)
 end
 
+
 ---@param square IsoGridSquare
 ---@return boolean
-DigStairsCursor.isValidInternal = function(self, square)
+function DigStairsCursor:isValidInternal(square)
     if not square then
         return false
     end
@@ -47,7 +49,8 @@ DigStairsCursor.isValidInternal = function(self, square)
     return true
 end
 
-DigStairsCursor.render = function(self, x, y, z, square)
+
+function DigStairsCursor:render(x, y, z, square)
     -- TODO: individual colours for each square so the player can tell why/where they can't dig
     local hc = getCore():getGoodHighlitedColor()
     if not self:isValid(square) then
@@ -71,46 +74,56 @@ DigStairsCursor.render = function(self, x, y, z, square)
     end
 end
 
-DigStairsCursor.rotate = function(self)
+
+function DigStairsCursor:rotate()
     self.orientation = self.orientation == "south" and "east" or "south"
 end
 
-DigStairsCursor.keyPressed = function(self, key)
+
+function DigStairsCursor:keyPressed(key)
     -- TODO: should also be able to rotate by dragging the mouse
     if CORE:isKey("Rotate building", key) then
         self:rotate()
     end
 end
 
-DigStairsCursor.onJoypadPressLB = function(self, joypadData)
+
+function DigStairsCursor:onJoypadPressLB(joypadData)
     self:rotate()
 end
 
-DigStairsCursor.onJoypadPressRB = function(self, joypadData)
+
+function DigStairsCursor:onJoypadPressRB(joypadData)
     self:rotate()
 end
 
-DigStairsCursor.getAPrompt = function(self)
+
+function DigStairsCursor:getAPrompt()
     local square = getSquare(self.xJoypad, self.yJoypad, self.zJoypad)
     return self:isValid(square) and getText("IGUI_Excavation_DigStairs") or nil
 end
 
-DigStairsCursor.getLBPrompt = function(self)
+
+function DigStairsCursor:getLBPrompt()
     return getText("IGUI_Controller_RotateLeft")
 end
 
-DigStairsCursor.getRBPrompt = function(self)
+
+function DigStairsCursor:getRBPrompt()
     return getText("IGUI_Controller_RotateRight")
 end
 
+
 ---@param player IsoPlayer
 ---@return DigStairsCursor
-DigStairsCursor.new = function(player)
+function DigStairsCursor.new(player)
     local o = BaseSquareCursor.new(player)
     setmetatable(o, DigStairsCursor) ---@cast o DigStairsCursor
+
     o.orientation = "south"
 
     return o
 end
+
 
 return DigStairsCursor
