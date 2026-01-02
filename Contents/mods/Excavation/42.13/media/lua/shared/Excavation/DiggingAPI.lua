@@ -1,18 +1,4 @@
-local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 local Eval = require("Excavation/Eval")
-
-local CLIENT = isClient()
-
----@module "Excavation/ExcavationMetaGrid"
-local ExcavationMetaGrid
-
--- TODO: functions that require this cannot be called by the client and should be moved into a separate module
-if not CLIENT then
-    Events.OnInitGlobalModData.Add(function()
-        ExcavationMetaGrid = require("Excavation/ExcavationMetaGrid")
-    end)
-end
-
 
 local DiggingAPI = {}
 
