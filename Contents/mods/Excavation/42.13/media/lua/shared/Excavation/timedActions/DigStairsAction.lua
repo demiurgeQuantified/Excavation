@@ -3,7 +3,10 @@ local DiggingAPI = require("Excavation/DiggingAPI")
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
 local TimedActionUtils = require("Starlit/timedActions/TimedActionUtils")
 local Eval = require("Excavation/Eval")
+local modules = require("Starlit/modules")
 
+---@module "Excavation/Mining"
+local Mining = modules.delayedRequire("Excavation/Mining")
 
 ---@class DigStairsAction : BaseDigAction
 ---@field square IsoGridSquare
@@ -36,11 +39,11 @@ function DigStairsAction:complete()
         -- to optimise this DiggingAPI needs a way to open an area of squares and calculate the necessary walls once
         for i = 1, 3 do
             -- remove the floor above the stairs
-            DiggingAPI.digFloor(getSquare(x, y + i, z))
+            Mining.mineFloor(getSquare(x, y + i, z))
 
             -- clear the square below
             local belowSquare = IsoObjectUtils.getOrCreateSquare(x, y + i, z - 1)
-            DiggingAPI.digSquare(x, y + i, z - 1)
+            Mining.mineSquare(x, y + i, z - 1)
 
             -- add the stair object
             -- TODO: these sprites don't quite reach the next level - looks good enough imo but should be fixed
@@ -55,14 +58,14 @@ function DigStairsAction:complete()
 
         local endSquare = IsoObjectUtils.getOrCreateSquare(x, y + 4, z - 1)
         if not endSquare:hasFloor() then
-            DiggingAPI.digSquare(x, y + 4, z - 1)
+            Mining.mineSquare(x, y + 4, z - 1)
         end
     else
         for i = 1, 3 do
-            DiggingAPI.digFloor(getSquare(x + i, y, z))
+            Mining.mineFloor(getSquare(x + i, y, z))
 
             local belowSquare = IsoObjectUtils.getOrCreateSquare(x + i, y, z - 1)
-            DiggingAPI.digSquare(x + i, y, z - 1)
+            Mining.mineSquare(x + i, y, z - 1)
 
             local obj = IsoObject.getNew(
                 belowSquare,
@@ -75,7 +78,7 @@ function DigStairsAction:complete()
 
         local endSquare = IsoObjectUtils.getOrCreateSquare(x + 4, y, z - 1)
         if not endSquare:getFloor() then
-            DiggingAPI.digSquare(x + 4, y, z - 1)
+            Mining.mineSquare(x + 4, y, z - 1)
         end
     end
 

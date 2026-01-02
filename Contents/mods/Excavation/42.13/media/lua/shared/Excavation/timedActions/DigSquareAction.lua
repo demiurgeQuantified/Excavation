@@ -3,6 +3,10 @@ local TimedActionUtils = require("Starlit/timedActions/TimedActionUtils")
 local Eval = require("Excavation/Eval")
 local DiggingAPI = require("Excavation/DiggingAPI")
 local IsoObjectUtils = require("Starlit/IsoObjectUtils")
+local modules = require("Starlit/modules")
+
+---@module "Excavation/Mining"
+local Mining = modules.delayedRequire("Excavation/Mining")
 
 
 ---@type table<string, true | nil>
@@ -171,7 +175,7 @@ end
 
 
 function DigSquareAction:complete()
-    DiggingAPI.digSquare(self.x, self.y, self.z)
+    Mining.mineSquare(self.x, self.y, self.z)
 
     local inverseStrengthLevel = 10 - self.character:getPerkLevel(Perks.Strength)
 
