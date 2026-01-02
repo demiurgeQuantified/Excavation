@@ -50,7 +50,7 @@ function DigStairsAction:complete()
             local obj = IsoObject.getNew(
                 belowSquare,
                 "fixtures_excavation_01_" .. tostring(6 - i),
-                "",
+                nil,
                 false
             )
             belowSquare:transmitAddObjectToSquare(obj, -1)
@@ -70,7 +70,7 @@ function DigStairsAction:complete()
             local obj = IsoObject.getNew(
                 belowSquare,
                 "fixtures_excavation_01_" .. tostring(3 - i),
-                "",
+                nil,
                 false
             )
             belowSquare:transmitAddObjectToSquare(obj, -1)
