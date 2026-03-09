@@ -1,0 +1,5 @@
+{
+    "Sandbox_Excavation":  "Excavation",
+    "Sandbox_Excavation_DisableDepthLimit":  "(불안정) 깊이 제한 비활성화",
+    "Sandbox_Excavation_DisableDepthLimit_tooltip":  "-1 이하로 계단을 파는 것을 허용합니다. <br> <RED> 심각한 그래픽 결함이 발생할 수 있으며, 간질 발작을 유발할 수 있습니다."
+}

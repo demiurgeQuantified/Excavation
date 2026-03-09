@@ -132,7 +132,7 @@ function ISDestroyStuffAction:complete()
                     IsoObject.getNew(
                         square,
                         material.wallCornerSoutheast,
-                        "",
+                        nil,
                         false
                     ),
                     -1
@@ -159,7 +159,7 @@ function ISDestroyStuffAction:complete()
                     IsoObject.getNew(
                         square,
                         material.wallCornerSoutheast,
-                        "",
+                        nil,
                         false
                     ),
                     -1
@@ -185,7 +185,7 @@ function ISDestroyStuffAction:complete()
             IsoObject.getNew(
                 square,
                 sprite,
-                "",
+                nil,
                 false
             ),
             -1
