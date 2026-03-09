@@ -1,0 +1,8 @@
+{
+    "Tooltip_Excavation_NeedDirtSack":  "이 작업을 수행하려면 %1 개의 흙 포대 자루가 필요합니다.",
+    "Tooltip_Excavation_TooExhausted":  "너무 지쳐서 팔 수 없습니다.",
+    "Tooltip_Excavation_NeedShovelForDirt":  "흙을 파려면 삽이 필요합니다.",
+    "Tooltip_Excavation_NeedPickaxeForStone":  "돌을 파려면 곡괭이가 필요합니다.",
+    "Tooltip_Excavation_NoPath":  "파기 시작할 수 있는 위치가 없습니다.",
+    "Tooltip_Excavation_WaterTile":  "해당 벽은 물 밑에 있습니다."
+}
