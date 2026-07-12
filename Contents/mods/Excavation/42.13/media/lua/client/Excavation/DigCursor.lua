@@ -26,7 +26,7 @@ DigCursor.__index = DigCursor
 function DigCursor:select(square)
     local z = square:getZ()
     DigSquareAction.queueNew(
-        self.player, square:getX(), square:getY(), z,
+        self:getPlayer(), square:getX(), square:getY(), z,
         z < DiggingAPI.STONE_LEVEL and "stone" or "dirt")
 
     BaseSquareCursor.select(self, square, Config.hideCursorAfterDigging)
@@ -43,7 +43,7 @@ function DigCursor:isValidInternal(square)
         return false
     end
 
-    local result = DigSquareAction.canBePerformed(self.player, material, square)
+    local result = DigSquareAction.canBePerformed(self:getPlayer(), material, square)
     return result
 end
 
