@@ -24,7 +24,7 @@ DigStairsCursor.__index = DigStairsCursor
 
 
 function DigStairsCursor:select(square)
-    DigStairsAction.queueNew(self.player, square, self.orientation)
+    DigStairsAction.queueNew(self:getPlayer(), square, self.orientation)
     BaseSquareCursor.select(self, square)
 end
 
@@ -42,7 +42,7 @@ function DigStairsCursor:isValidInternal(square)
         return false
     end
 
-    if not DigStairsAction.canBePerformed(self.player, material, square, self.orientation) then
+    if not DigStairsAction.canBePerformed(self:getPlayer(), material, square, self.orientation) then
         return false
     end
 
